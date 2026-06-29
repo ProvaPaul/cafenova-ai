@@ -6,33 +6,29 @@ import com.smartcafe.model.User;
 import com.smartcafe.util.SessionManager;
 import com.smartcafe.view.components.RoundedButton;
 import com.smartcafe.view.components.SidebarButton;
-import com.smartcafe.view.panel.CategoryPanel;
-import com.smartcafe.view.panel.DashboardHomePanel;
-import com.smartcafe.view.panel.ProductPanel;
+import com.smartcafe.view.panel.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-/**
- * Admin dashboard — full access to all implemented modules.
- *
- * Content area uses CardLayout; each sidebar button calls switchTo(key).
- * Panels that are not yet implemented show a "Coming Soon" placeholder.
- */
 public class AdminDashboard extends JPanel {
 
-    private static final String NAV_HOME       = "HOME";
-    private static final String NAV_CATEGORIES = "CATEGORIES";
-    private static final String NAV_PRODUCTS   = "PRODUCTS";
+    private static final String K_HOME      = "HOME";
+    private static final String K_CATS      = "CATEGORIES";
+    private static final String K_PRODUCTS  = "PRODUCTS";
+    private static final String K_INVENTORY = "INVENTORY";
+    private static final String K_POS       = "POS";
+    private static final String K_BILLING   = "BILLING";
 
     private static final Object[][] NAV = {
-        {"🏠",  "Dashboard",       NAV_HOME},
-        {"🏷",  "Categories",      NAV_CATEGORIES},
-        {"📦",  "Products",        NAV_PRODUCTS},
+        {"🏠",  "Dashboard",       K_HOME},
+        {"🏷",  "Categories",      K_CATS},
+        {"📦",  "Products",        K_PRODUCTS},
         {"👥",  "User Management", null},
-        {"📋",  "Orders",          null},
-        {"🏭",  "Inventory",       null},
+        {"🖥️", "POS",              K_POS},
+        {"🏭",  "Inventory",       K_INVENTORY},
+        {"💳",  "Billing",         K_BILLING},
         {"📊",  "Reports",         null},
         {"🤖",  "AI Insights",     null},
         {"⚙️",  "Settings",        null},
@@ -41,54 +37,60 @@ public class AdminDashboard extends JPanel {
     private final AuthController    controller;
     private final CardLayout        cardLayout  = new CardLayout();
     private final JPanel            contentArea = new JPanel(cardLayout);
-    private       DashboardHomePanel homePanel;
-    private       CategoryPanel      categoryPanel;
-    private       ProductPanel       productPanel;
-    private       SidebarButton[]    sidebarBtns;
+
+    private DashboardHomePanel homePanel;
+    private CategoryPanel      categoryPanel;
+    private ProductPanel       productPanel;
+    private InventoryPanel     inventoryPanel;
+    private POSPanel           posPanel;
+    private BillHistoryPanel   billingPanel;
+    private SidebarButton[]    sidebarBtns;
 
     public AdminDashboard(AuthController controller) {
         this.controller = controller;
         setLayout(new BorderLayout());
         setBackground(AppConfig.COLOR_BG);
-
         buildContentArea();
         add(buildHeader(),  BorderLayout.NORTH);
         add(buildSidebar(), BorderLayout.WEST);
         add(contentArea,    BorderLayout.CENTER);
     }
 
-    // ── Content area ──────────────────────────────────────────────────────────
-
     private void buildContentArea() {
         contentArea.setBackground(AppConfig.COLOR_BG);
 
-        homePanel     = new DashboardHomePanel(
-                () -> switchTo(NAV_CATEGORIES),
-                () -> switchTo(NAV_PRODUCTS));
-        categoryPanel = new CategoryPanel();
-        productPanel  = new ProductPanel(false);
+        homePanel      = new DashboardHomePanel(() -> switchTo(K_CATS), () -> switchTo(K_PRODUCTS));
+        categoryPanel  = new CategoryPanel();
+        productPanel   = new ProductPanel(false);
+        inventoryPanel = new InventoryPanel();
+        posPanel       = new POSPanel();
+        billingPanel   = new BillHistoryPanel();
 
-        contentArea.add(homePanel,     NAV_HOME);
-        contentArea.add(categoryPanel, NAV_CATEGORIES);
-        contentArea.add(productPanel,  NAV_PRODUCTS);
+        contentArea.add(homePanel,      K_HOME);
+        contentArea.add(categoryPanel,  K_CATS);
+        contentArea.add(productPanel,   K_PRODUCTS);
+        contentArea.add(inventoryPanel, K_INVENTORY);
+        contentArea.add(posPanel,       K_POS);
+        contentArea.add(billingPanel,   K_BILLING);
         contentArea.add(comingSoon("User Management"), "USER_MANAGEMENT");
-        contentArea.add(comingSoon("Orders"),          "ORDERS");
-        contentArea.add(comingSoon("Inventory"),       "INVENTORY");
         contentArea.add(comingSoon("Reports"),         "REPORTS");
         contentArea.add(comingSoon("AI Insights"),     "AI");
         contentArea.add(comingSoon("Settings"),        "SETTINGS");
 
-        cardLayout.show(contentArea, NAV_HOME);
+        cardLayout.show(contentArea, K_HOME);
     }
 
     private void switchTo(String key) {
         cardLayout.show(contentArea, key);
-        if (NAV_HOME.equals(key))       homePanel.refresh();
-        if (NAV_CATEGORIES.equals(key)) categoryPanel.loadData();
-        if (NAV_PRODUCTS.equals(key))   productPanel.loadData();
+        switch (key) {
+            case K_HOME      -> homePanel.refresh();
+            case K_CATS      -> categoryPanel.loadData();
+            case K_PRODUCTS  -> productPanel.loadData();
+            case K_INVENTORY -> inventoryPanel.loadData();
+            case K_POS       -> posPanel.loadData();
+            case K_BILLING   -> billingPanel.loadData();
+        }
     }
-
-    // ── Header ────────────────────────────────────────────────────────────────
 
     private JPanel buildHeader() {
         JPanel h = new JPanel(new BorderLayout());
@@ -102,20 +104,19 @@ public class AdminDashboard extends JPanel {
         JLabel name = new JLabel(AppConfig.APP_NAME);
         name.setFont(AppConfig.FONT_LABEL);
         name.setForeground(AppConfig.COLOR_TEXT_PRIMARY);
-        left.add(cup);
-        left.add(name);
+        left.add(cup); left.add(name);
 
         JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
         right.setOpaque(false);
         User u = SessionManager.getCurrentUser();
         JLabel userLbl = new JLabel("<html><b>" + (u != null ? u.getFullName() : "—") + "</b>"
-                + "&nbsp;<span style='color:#8B5E3C;'>" + (u != null ? u.getRole().getDisplayName() : "") + "</span></html>");
+                + "&nbsp;<span style='color:#8B5E3C;'>"
+                + (u != null ? u.getRole().getDisplayName() : "") + "</span></html>");
         userLbl.setFont(AppConfig.FONT_BODY);
         userLbl.setForeground(AppConfig.COLOR_TEXT_PRIMARY);
         RoundedButton logoutBtn = new RoundedButton("Sign Out", RoundedButton.Style.GHOST);
         logoutBtn.addActionListener(e -> controller.logout());
-        right.add(userLbl);
-        right.add(logoutBtn);
+        right.add(userLbl); right.add(logoutBtn);
 
         h.add(left,  BorderLayout.WEST);
         h.add(right, BorderLayout.EAST);
@@ -124,8 +125,6 @@ public class AdminDashboard extends JPanel {
                 new EmptyBorder(0, 20, 0, 20)));
         return h;
     }
-
-    // ── Sidebar ───────────────────────────────────────────────────────────────
 
     private JPanel buildSidebar() {
         JPanel sb = new JPanel();
@@ -141,7 +140,6 @@ public class AdminDashboard extends JPanel {
             String icon  = (String) NAV[i][0];
             String label = (String) NAV[i][1];
             String key   = (String) NAV[i][2];
-
             SidebarButton btn = new SidebarButton(icon, label);
             sidebarBtns[i] = btn;
             final int idx = i;
@@ -157,38 +155,22 @@ public class AdminDashboard extends JPanel {
         return sb;
     }
 
-    // ── Coming-soon placeholder ───────────────────────────────────────────────
-
-    private static JPanel comingSoon(String moduleName) {
+    private static JPanel comingSoon(String name) {
         JPanel p = new JPanel(new GridBagLayout());
         p.setBackground(AppConfig.COLOR_BG);
-        JLabel icon = new JLabel("🚀");
-        icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
-        JLabel title = new JLabel(moduleName + " — Coming Soon");
-        title.setFont(AppConfig.FONT_TITLE);
-        title.setForeground(AppConfig.COLOR_TEXT_PRIMARY);
-        JLabel sub = new JLabel("This module will be implemented in the next step.");
-        sub.setFont(AppConfig.FONT_SUBTITLE);
-        sub.setForeground(AppConfig.COLOR_TEXT_SECONDARY);
-
-        JPanel inner = new JPanel();
-        inner.setOpaque(false);
+        JPanel inner = new JPanel(); inner.setOpaque(false);
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
-        icon.setAlignmentX(Component.CENTER_ALIGNMENT);
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        sub.setAlignmentX(Component.CENTER_ALIGNMENT);
-        inner.add(icon);
-        inner.add(Box.createVerticalStrut(12));
-        inner.add(title);
-        inner.add(Box.createVerticalStrut(6));
-        inner.add(sub);
-
+        JLabel icon  = new JLabel("🚀"); icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
+        JLabel title = new JLabel(name + " — Coming Soon"); title.setFont(AppConfig.FONT_TITLE);
+        title.setForeground(AppConfig.COLOR_TEXT_PRIMARY);
+        JLabel sub = new JLabel("This module will be implemented in a future step.");
+        sub.setFont(AppConfig.FONT_SUBTITLE); sub.setForeground(AppConfig.COLOR_TEXT_SECONDARY);
+        for (JLabel l : new JLabel[]{icon, title, sub}) l.setAlignmentX(Component.CENTER_ALIGNMENT);
+        inner.add(icon); inner.add(Box.createVerticalStrut(12));
+        inner.add(title); inner.add(Box.createVerticalStrut(6)); inner.add(sub);
         p.add(inner);
         return p;
     }
 
-    /** Called by MainFrame each time this dashboard becomes visible after login. */
-    public void refresh() {
-        homePanel.refresh();
-    }
+    public void refresh() { homePanel.refresh(); }
 }

@@ -6,44 +6,48 @@ import com.smartcafe.model.User;
 import com.smartcafe.util.SessionManager;
 import com.smartcafe.view.components.RoundedButton;
 import com.smartcafe.view.components.SidebarButton;
-import com.smartcafe.view.panel.CategoryPanel;
-import com.smartcafe.view.panel.DashboardHomePanel;
-import com.smartcafe.view.panel.ProductPanel;
+import com.smartcafe.view.panel.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-/** Manager dashboard — operations and reporting scope. */
 public class ManagerDashboard extends JPanel {
 
-    private static final String NAV_HOME       = "HOME";
-    private static final String NAV_CATEGORIES = "CATEGORIES";
-    private static final String NAV_PRODUCTS   = "PRODUCTS";
+    private static final String K_HOME      = "HOME";
+    private static final String K_CATS      = "CATEGORIES";
+    private static final String K_PRODUCTS  = "PRODUCTS";
+    private static final String K_INVENTORY = "INVENTORY";
+    private static final String K_POS       = "POS";
+    private static final String K_BILLING   = "BILLING";
 
     private static final Object[][] NAV = {
-        {"🏠", "Dashboard",   NAV_HOME},
-        {"🏷", "Categories",  NAV_CATEGORIES},
-        {"📦", "Products",    NAV_PRODUCTS},
-        {"📋", "Orders",      null},
-        {"🏭", "Inventory",   null},
-        {"📊", "Reports",     null},
-        {"🤖", "AI Insights", null},
+        {"🏠",  "Dashboard",   K_HOME},
+        {"🏷",  "Categories",  K_CATS},
+        {"📦",  "Products",    K_PRODUCTS},
+        {"🖥️", "POS",          K_POS},
+        {"🏭",  "Inventory",   K_INVENTORY},
+        {"💳",  "Billing",     K_BILLING},
+        {"📊",  "Reports",     null},
+        {"🤖",  "AI Insights", null},
     };
 
-    private final AuthController     controller;
-    private final CardLayout         cardLayout  = new CardLayout();
-    private final JPanel             contentArea = new JPanel(cardLayout);
-    private       DashboardHomePanel homePanel;
-    private       CategoryPanel      categoryPanel;
-    private       ProductPanel       productPanel;
-    private       SidebarButton[]    sidebarBtns;
+    private final AuthController    controller;
+    private final CardLayout        cardLayout  = new CardLayout();
+    private final JPanel            contentArea = new JPanel(cardLayout);
+
+    private DashboardHomePanel homePanel;
+    private CategoryPanel      categoryPanel;
+    private ProductPanel       productPanel;
+    private InventoryPanel     inventoryPanel;
+    private POSPanel           posPanel;
+    private BillHistoryPanel   billingPanel;
+    private SidebarButton[]    sidebarBtns;
 
     public ManagerDashboard(AuthController controller) {
         this.controller = controller;
         setLayout(new BorderLayout());
         setBackground(AppConfig.COLOR_BG);
-
         buildContentArea();
         add(buildHeader(),  BorderLayout.NORTH);
         add(buildSidebar(), BorderLayout.WEST);
@@ -53,59 +57,55 @@ public class ManagerDashboard extends JPanel {
     private void buildContentArea() {
         contentArea.setBackground(AppConfig.COLOR_BG);
 
-        homePanel     = new DashboardHomePanel(
-                () -> switchTo(NAV_CATEGORIES),
-                () -> switchTo(NAV_PRODUCTS));
-        categoryPanel = new CategoryPanel();
-        productPanel  = new ProductPanel(false);
+        homePanel      = new DashboardHomePanel(() -> switchTo(K_CATS), () -> switchTo(K_PRODUCTS));
+        categoryPanel  = new CategoryPanel();
+        productPanel   = new ProductPanel(false);
+        inventoryPanel = new InventoryPanel();
+        posPanel       = new POSPanel();
+        billingPanel   = new BillHistoryPanel();
 
-        contentArea.add(homePanel,     NAV_HOME);
-        contentArea.add(categoryPanel, NAV_CATEGORIES);
-        contentArea.add(productPanel,  NAV_PRODUCTS);
-        contentArea.add(comingSoon("Orders"),      "ORDERS");
-        contentArea.add(comingSoon("Inventory"),   "INVENTORY");
+        contentArea.add(homePanel,      K_HOME);
+        contentArea.add(categoryPanel,  K_CATS);
+        contentArea.add(productPanel,   K_PRODUCTS);
+        contentArea.add(inventoryPanel, K_INVENTORY);
+        contentArea.add(posPanel,       K_POS);
+        contentArea.add(billingPanel,   K_BILLING);
         contentArea.add(comingSoon("Reports"),     "REPORTS");
         contentArea.add(comingSoon("AI Insights"), "AI");
 
-        cardLayout.show(contentArea, NAV_HOME);
+        cardLayout.show(contentArea, K_HOME);
     }
 
     private void switchTo(String key) {
         cardLayout.show(contentArea, key);
-        if (NAV_HOME.equals(key))       homePanel.refresh();
-        if (NAV_CATEGORIES.equals(key)) categoryPanel.loadData();
-        if (NAV_PRODUCTS.equals(key))   productPanel.loadData();
+        switch (key) {
+            case K_HOME      -> homePanel.refresh();
+            case K_CATS      -> categoryPanel.loadData();
+            case K_PRODUCTS  -> productPanel.loadData();
+            case K_INVENTORY -> inventoryPanel.loadData();
+            case K_POS       -> posPanel.loadData();
+            case K_BILLING   -> billingPanel.loadData();
+        }
     }
 
     private JPanel buildHeader() {
         JPanel h = new JPanel(new BorderLayout());
         h.setBackground(AppConfig.COLOR_HEADER_BG);
         h.setPreferredSize(new Dimension(0, AppConfig.HEADER_HEIGHT));
-
-        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
-        left.setOpaque(false);
-        JLabel cup = new JLabel("☕");
-        cup.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
-        JLabel nm = new JLabel(AppConfig.APP_NAME);
-        nm.setFont(AppConfig.FONT_LABEL);
+        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0)); left.setOpaque(false);
+        JLabel cup = new JLabel("☕"); cup.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 24));
+        JLabel nm = new JLabel(AppConfig.APP_NAME); nm.setFont(AppConfig.FONT_LABEL);
         nm.setForeground(AppConfig.COLOR_TEXT_PRIMARY);
-        left.add(cup);
-        left.add(nm);
-
-        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
-        right.setOpaque(false);
+        left.add(cup); left.add(nm);
+        JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0)); right.setOpaque(false);
         User u = SessionManager.getCurrentUser();
         JLabel info = new JLabel("<html><b>" + (u != null ? u.getFullName() : "—") + "</b>"
                 + "&nbsp;<span style='color:#8B5E3C;'>Manager</span></html>");
-        info.setFont(AppConfig.FONT_BODY);
-        info.setForeground(AppConfig.COLOR_TEXT_PRIMARY);
+        info.setFont(AppConfig.FONT_BODY); info.setForeground(AppConfig.COLOR_TEXT_PRIMARY);
         RoundedButton logout = new RoundedButton("Sign Out", RoundedButton.Style.GHOST);
         logout.addActionListener(e -> controller.logout());
-        right.add(info);
-        right.add(logout);
-
-        h.add(left, BorderLayout.WEST);
-        h.add(right, BorderLayout.EAST);
+        right.add(info); right.add(logout);
+        h.add(left, BorderLayout.WEST); h.add(right, BorderLayout.EAST);
         h.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 1, 0, AppConfig.COLOR_BORDER),
                 new EmptyBorder(0, 20, 0, 20)));
@@ -120,13 +120,9 @@ public class ManagerDashboard extends JPanel {
         sb.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 0, 1, AppConfig.COLOR_BORDER),
                 new EmptyBorder(16, 0, 16, 0)));
-
         sidebarBtns = new SidebarButton[NAV.length];
         for (int i = 0; i < NAV.length; i++) {
-            String icon  = (String) NAV[i][0];
-            String label = (String) NAV[i][1];
-            String key   = (String) NAV[i][2];
-
+            String icon = (String) NAV[i][0], label = (String) NAV[i][1], key = (String) NAV[i][2];
             SidebarButton btn = new SidebarButton(icon, label);
             sidebarBtns[i] = btn;
             final int idx = i;
@@ -142,35 +138,20 @@ public class ManagerDashboard extends JPanel {
         return sb;
     }
 
-    private static JPanel comingSoon(String moduleName) {
-        JPanel p = new JPanel(new GridBagLayout());
-        p.setBackground(AppConfig.COLOR_BG);
-        JLabel icon = new JLabel("🚀");
-        icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
-        JLabel title = new JLabel(moduleName + " — Coming Soon");
-        title.setFont(AppConfig.FONT_TITLE);
-        title.setForeground(AppConfig.COLOR_TEXT_PRIMARY);
-        JLabel sub = new JLabel("This module will be implemented in the next step.");
-        sub.setFont(AppConfig.FONT_SUBTITLE);
-        sub.setForeground(AppConfig.COLOR_TEXT_SECONDARY);
-
-        JPanel inner = new JPanel();
-        inner.setOpaque(false);
+    private static JPanel comingSoon(String name) {
+        JPanel p = new JPanel(new GridBagLayout()); p.setBackground(AppConfig.COLOR_BG);
+        JPanel inner = new JPanel(); inner.setOpaque(false);
         inner.setLayout(new BoxLayout(inner, BoxLayout.Y_AXIS));
-        icon.setAlignmentX(Component.CENTER_ALIGNMENT);
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
-        sub.setAlignmentX(Component.CENTER_ALIGNMENT);
-        inner.add(icon);
-        inner.add(Box.createVerticalStrut(12));
-        inner.add(title);
-        inner.add(Box.createVerticalStrut(6));
-        inner.add(sub);
-
-        p.add(inner);
-        return p;
+        JLabel icon = new JLabel("🚀"); icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
+        JLabel title = new JLabel(name + " — Coming Soon"); title.setFont(AppConfig.FONT_TITLE);
+        title.setForeground(AppConfig.COLOR_TEXT_PRIMARY);
+        JLabel sub = new JLabel("This module will be implemented in a future step.");
+        sub.setFont(AppConfig.FONT_SUBTITLE); sub.setForeground(AppConfig.COLOR_TEXT_SECONDARY);
+        for (JLabel l : new JLabel[]{icon, title, sub}) l.setAlignmentX(Component.CENTER_ALIGNMENT);
+        inner.add(icon); inner.add(Box.createVerticalStrut(12));
+        inner.add(title); inner.add(Box.createVerticalStrut(6)); inner.add(sub);
+        p.add(inner); return p;
     }
 
-    public void refresh() {
-        homePanel.refresh();
-    }
+    public void refresh() { homePanel.refresh(); }
 }

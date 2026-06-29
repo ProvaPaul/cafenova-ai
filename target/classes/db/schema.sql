@@ -106,10 +106,11 @@ CREATE TABLE IF NOT EXISTS cafe_tables (
 
 CREATE TABLE IF NOT EXISTS orders (
     id           INT            NOT NULL AUTO_INCREMENT,
-    order_number VARCHAR(20)    NOT NULL,          -- e.g. "ORD-20260629-0001"
-    table_id     INT            NULL,              -- NULL for takeaway/delivery
-    cashier_id   INT            NOT NULL,
-    order_type   ENUM('DINE_IN','TAKEAWAY','DELIVERY') NOT NULL DEFAULT 'DINE_IN',
+    order_number  VARCHAR(20)    NOT NULL,          -- e.g. "ORD-20260629-0001"
+    table_id      INT            NULL,              -- NULL for takeaway/delivery
+    cashier_id    INT            NOT NULL,
+    customer_name VARCHAR(100)   NULL,              -- optional walk-in customer name
+    order_type    ENUM('DINE_IN','TAKEAWAY','DELIVERY') NOT NULL DEFAULT 'DINE_IN',
     status       ENUM('PENDING','IN_PROGRESS','READY','SERVED','COMPLETED','CANCELLED')
                                NOT NULL DEFAULT 'PENDING',
     subtotal     DECIMAL(10,2) NOT NULL DEFAULT 0.00,
@@ -241,6 +242,9 @@ INSERT IGNORE INTO categories (name, description, sort_order) VALUES
     ('Snacks',         'Light bites and side orders',       6);
 
 -- Default cafe tables
+-- Migration: add customer_name for existing installations (MySQL 8.0+ IF NOT EXISTS)
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_name VARCHAR(100) NULL AFTER cashier_id;
+
 INSERT IGNORE INTO cafe_tables (table_number, capacity, location) VALUES
     ('T01', 2, 'Indoor'), ('T02', 2, 'Indoor'), ('T03', 4, 'Indoor'),
     ('T04', 4, 'Indoor'), ('T05', 6, 'Indoor'), ('T06', 6, 'Indoor'),
