@@ -1,10 +1,16 @@
 package com.smartcafe;
 
 import com.smartcafe.config.AppConfig;
+import com.smartcafe.config.AppContext;
 import com.smartcafe.config.DatabaseConfig;
 import com.smartcafe.controller.AuthController;
+import com.smartcafe.dao.impl.CategoryDaoImpl;
+import com.smartcafe.dao.impl.ProductDaoImpl;
 import com.smartcafe.dao.impl.UserDaoImpl;
 import com.smartcafe.service.impl.AuthServiceImpl;
+import com.smartcafe.service.impl.CategoryServiceImpl;
+import com.smartcafe.service.impl.DashboardServiceImpl;
+import com.smartcafe.service.impl.ProductServiceImpl;
 import com.smartcafe.view.MainFrame;
 
 import javax.swing.*;
@@ -40,9 +46,17 @@ public class Main {
         }
 
         // ③ Dependency wiring (manual DI — no framework needed at this scale)
-        //    DAO is stateless so one instance suffices for the whole app.
+        //    DAOs are stateless so one instance suffices for the whole app.
         UserDaoImpl     userDao     = new UserDaoImpl();
-        AuthServiceImpl authService = new AuthServiceImpl(userDao);
+        CategoryDaoImpl categoryDao = new CategoryDaoImpl();
+        ProductDaoImpl  productDao  = new ProductDaoImpl();
+
+        AuthServiceImpl     authService     = new AuthServiceImpl(userDao);
+        CategoryServiceImpl categoryService = new CategoryServiceImpl(categoryDao, productDao);
+        ProductServiceImpl  productService  = new ProductServiceImpl(productDao, categoryDao);
+        DashboardServiceImpl dashboardService = new DashboardServiceImpl();
+
+        AppContext.initialize(categoryService, productService, dashboardService);
 
         // ④ Build and show UI on the EDT
         SwingUtilities.invokeLater(() -> {
