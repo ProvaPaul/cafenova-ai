@@ -6,8 +6,14 @@ python-dotenv==1.0.1
 httpx==0.28.1
 loguru==0.7.3
 
-# Data science — used by preprocess.py and train.py
+# Data science — Apriori training
 pandas>=2.2.0
 mlxtend>=0.23.0
 joblib>=1.3.0
 pyarrow>=14.0.0
+
+# MySQL database connection
+mysql-connector-python>=8.3.0
+
+# Scheduled auto-retrain (optional — gracefully disabled if not installed)
+apscheduler>=3.10.4

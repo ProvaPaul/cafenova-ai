@@ -10,12 +10,14 @@ C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\ja
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\controller\AuthController.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\impl\CategoryDaoImpl.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\util\PdfInvoiceUtil.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\AiAnalyticsPanel.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\CategoryService.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\ProductPanel.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\impl\InventoryItemDaoImpl.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\model\Product.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\model\Customer.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\InventoryItemDao.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\ai\AiRecommendationServiceImpl.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\ai\client\RestApiClient.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\EmployeeDao.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\AttendanceService.java
@@ -29,6 +31,8 @@ C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\ja
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\impl\CategoryServiceImpl.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\impl\SupplierServiceImpl.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\model\Category.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\impl\NotificationServiceImpl.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\NotificationService.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\InvoiceDialog.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\impl\PaymentDaoImpl.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\dashboard\CashierDashboard.java
@@ -45,8 +49,11 @@ C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\ja
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\CafeTableDao.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\dashboard\AdminDashboard.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\EmployeeFormDialog.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\impl\NotificationDaoImpl.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\InventoryMovementDao.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\impl\UserDaoImpl.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\impl\ReportServiceImpl.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\InventoryMovementService.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\model\Employee.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\CustomerFormDialog.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\POSPanel.java
@@ -58,6 +65,7 @@ C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\ja
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\SupplierFormDialog.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\impl\BillingServiceImpl.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\CategoryFormDialog.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\model\InventoryMovement.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\ReservationDao.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\impl\SupplierDaoImpl.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\exception\ValidationException.java
@@ -66,6 +74,7 @@ C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\ja
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\config\DatabaseConfig.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\impl\ProductServiceImpl.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\ReportPanel.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\NotificationDao.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\util\ValidationUtil.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\CategoryDao.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\CustomerDao.java
@@ -80,6 +89,7 @@ C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\ja
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\ReservationService.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\PaymentDialog.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\impl\EmployeeDaoImpl.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\OrderManagementPanel.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\model\Attendance.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\model\CartItem.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\OrderDao.java
@@ -87,8 +97,10 @@ C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\ja
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\EmployeePanel.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\auth\LoginPanel.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\impl\OrderDaoImpl.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\impl\InventoryMovementDaoImpl.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\SalaryService.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\impl\AttendanceDaoImpl.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\impl\InventoryMovementServiceImpl.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\SupplierService.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\model\Order.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\model\Supplier.java
@@ -100,10 +112,12 @@ C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\ja
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\CategoryPanel.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\ai\AiRecommendationService.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\service\CustomerService.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\util\PermissionManager.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\DashboardHomePanel.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\config\AppContext.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\SalaryPaymentDao.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\panel\BillHistoryPanel.java
+C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\model\AppNotification.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\view\MainFrame.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\util\TokenUtil.java
 C:\Users\User\OneDrive\Desktop\projects\Smart Cafe Management System\src\main\java\com\smartcafe\dao\impl\ReservationDaoImpl.java

@@ -1,100 +1,113 @@
-# SmartCafe AI — Technical Documentation
+# SmartCafe AI — Technical Documentation v2.0
 
-## Overview
+## Architecture Overview
 
-The SmartCafe AI Recommendation Engine uses **Market Basket Analysis** via the
-**Apriori algorithm** to find items frequently purchased together.
-
-**Phase:** Validation (public Groceries dataset)  
-**Phase Next:** Production (Cafe Orders + OrderItems tables)
-
----
-
-## Dataset
-
-**Name:** Groceries Dataset (Market Basket Analysis)  
-**Source:** Public / Kaggle  
-**Location:** `archive/Groceries_dataset.csv`
-
-| Attribute         | Value                    |
-|-------------------|--------------------------|
-| Total rows        | 38,765                   |
-| Unique members    | 3,898                    |
-| Unique items      | 167                      |
-| Date range        | 2014-01-01 – 2015-12-30  |
-
-**Top items by frequency:**
-1. whole milk (25.9%)
-2. other vegetables (21.5%)
-3. rolls/buns (17.9%)
-4. soda (13.4%)
-5. yogurt (10.8%)
-
----
-
-## Preprocessing Pipeline
-
-**Script:** `ai-service/preprocess.py`
-
-### Steps
-
-1. **Load & Validate**
-   - Read CSV, check for required columns (`Member_number`, `Date`, `itemDescription`)
-   - Drop rows with missing values
-   - Normalise item names to lowercase
-
-2. **Transaction Grouping**
-   - Group by `Member_number` — each member's full purchase history is one basket
-   - Why member-level (not date-level)?  
-     Date-level grouping produced baskets of ~2.6 items on average — too sparse
-     for Apriori to find meaningful patterns.  
-     Member-level grouping produces baskets of ~8.9 unique items, providing
-     sufficient co-occurrence signal (797 rules at confidence ≥ 0.30).
-
-3. **One-Hot Encoding**
-   - Uses `mlxtend.preprocessing.TransactionEncoder`
-   - Output: boolean DataFrame of 3,892 baskets × 167 items
-   - RAM: ~0.6 MB (bool dtype, ~8× smaller than float64)
-
-4. **Statistics**
-   - Saved to `data/dataset_stats.json`
-
-**Outputs:**
-- `data/encoded_transactions.parquet` — encoded baskets (120 KB)
-- `data/transactions.json` — raw transaction list
-- `data/dataset_stats.json` — summary statistics
+```
+MySQL Database
+  └─ orders (COMPLETED)
+       └─ order_items → menu_items
+                │
+                ▼
+    Transaction Builder  (app/db/transaction_builder.py)
+    [order_id → [item_name, item_name, ...]]
+                │
+                ▼
+    One-Hot Encoding  (mlxtend.TransactionEncoder)
+    [2500 baskets × 100 items boolean DataFrame]
+                │
+                ▼
+    Apriori Algorithm  (mlxtend.frequent_patterns.apriori)
+    min_support=0.02, max_len=3
+                │
+                ▼
+    Association Rules  (mlxtend.frequent_patterns.association_rules)
+    metric="confidence", min_threshold=0.30
+                │
+                ▼
+    trained_rules.joblib (versioned)  ←──── Loaded by ai_engine.py
+                │
+                ▼
+    FastAPI Recommendation Engine
+    /recommend  /trending  /personal/{id}  /explain  /rules
+```
 
 ---
 
-## Model Training
+## Dataset Phases
 
-**Script:** `ai-service/train.py`  
-**Algorithm:** Apriori → Association Rules  
-**Library:** `mlxtend 0.23+`
+| Phase | Source                    | Model name            | Status      |
+|-------|---------------------------|-----------------------|-------------|
+| 1     | Groceries CSV (public)    | apriori_groceries_v1  | Validation  |
+| 2     | Cafe Demo Data (generated)| cafe_v{timestamp}     | Demo        |
+| 3     | Real Cafe Orders          | cafe_v{timestamp}     | Production  |
 
-### Parameters
+**No code changes are needed between phases.** Only the model file changes.
 
-| Parameter        | Value | Rationale                                      |
-|------------------|-------|------------------------------------------------|
-| `min_support`    | 0.02  | Item must appear in ≥2% of member baskets      |
-| `min_confidence` | 0.30  | Rule fires correctly at least 30% of the time  |
-| `max_len`        | 3     | Max 3 items per itemset (prevents combinatorial explosion) |
+---
 
-### Results
+## Demo Data Generation
 
-| Metric                | Value     |
-|-----------------------|-----------|
-| Frequent itemsets     | 876       |
-| Association rules     | 797       |
-| Avg confidence        | 44.2%     |
-| Avg lift              | 1.207     |
-| Max lift              | 1.563     |
-| Training time         | ~0.2 s    |
-| Model file size       | 44 KB     |
+**Script:** `ai-service/scripts/generate_demo_data.py`
 
-**Outputs:**
-- `data/trained_rules.joblib` — serialised rules DataFrame (compress=3)
-- `data/metadata.json` — training parameters and statistics
+Inserts into MySQL:
+- 10 categories: Coffee, Tea, Burger, Pizza, Pasta, Sandwich, Dessert, Juice, Soft Drinks, Snacks
+- 100 menu items: 10 per category with realistic prices
+- 200 customers: Filipino names, unique phones, `@demo.smartcafe.local` emails
+- ~2 500 COMPLETED orders with 2–6 items each
+
+**Buying patterns (69 combo templates):**
+- 72% of orders use a buying pattern template (creates strong associations)
+- 28% use random items (realistic noise)
+
+**Example learned associations:**
+- Espresso → Brownie (confidence ≈ 72%, lift ≈ 2.4)
+- Classic Burger → French Fries → Coke
+- Pepperoni Pizza → Garlic Bread
+- Spaghetti Bolognese → Garlic Bread → Lemonade
+- Jasmine Tea → Cheesecake
+
+**Demo data markers (for clean deletion):**
+- Orders: `order_number LIKE 'DMO-%'`
+- Customers: `email LIKE '%@demo.smartcafe.local'`
+
+---
+
+## Training Pipeline
+
+**Script:** `ai-service/scripts/train_from_db.py`
+
+### Step 1 — Load Transactions from MySQL
+```sql
+SELECT o.id AS order_id, mi.name AS item_name
+FROM   orders o
+JOIN   order_items  oi ON oi.order_id    = o.id
+JOIN   menu_items   mi ON mi.id          = oi.menu_item_id
+WHERE  o.status = 'COMPLETED'
+ORDER  BY o.id, mi.name
+```
+Each completed order becomes one basket. Items within an order are grouped by `order_id`.
+
+### Step 2 — One-Hot Encoding
+`TransactionEncoder.fit_transform()` → boolean DataFrame
+
+### Step 3 — Apriori
+```python
+freq_items = apriori(encoded, min_support=0.02, use_colnames=True, max_len=3)
+rules = association_rules(freq_items, metric="confidence", min_threshold=0.30)
+rules = rules.sort_values("lift", ascending=False)
+```
+
+**Adaptive min_support:** if `n_transactions < 200`, min_support is halved to find patterns in smaller datasets.
+
+### Step 4 — Save Versioned Model
+- New file: `data/models/cafe_v{YYYYMMDD_HHMMSS}_rules.joblib`
+- Latest copy: `data/trained_rules.joblib` (always points to newest)
+- Metadata: `data/metadata.json`
+- DB log: `ai_training_sessions` table
+
+### Step 5 — Hot Reload
+After saving, `admin.py` resets `engine._ready = False` and calls `ensure_loaded()`.
+No server restart needed.
 
 ---
 
@@ -102,99 +115,132 @@ The SmartCafe AI Recommendation Engine uses **Market Basket Analysis** via the
 
 **File:** `ai-service/app/services/ai_engine.py`
 
-### Architecture
-
-```
-Request (items=[])
-       │
-       ▼
-ai_engine._Engine.recommend()
-       │
-       ├─ Filter rules: antecedents ⊆ input_items
-       ├─ Collect consequents
-       ├─ Deduplicate (best lift per unique item)
-       ├─ Sort by lift desc, confidence desc
-       └─ Return top N
-```
-
 ### Singleton Pattern
-The engine is loaded once at startup (`ensure_loaded()` in `main.py` lifespan).
-Subsequent requests hit the in-memory DataFrame — no disk I/O per request.
+```python
+_engine = _Engine()   # module-level singleton
+
+def get_engine() -> _Engine:
+    return _engine
+
+def ensure_loaded() -> bool:
+    return _engine.load()   # no-op if already loaded
+```
+
+### recommend() Algorithm
+```
+Given input_items = ["Classic Burger", "French Fries"]
+
+For each rule in trained_rules:
+    if rule.antecedents ⊆ input_items
+    AND rule.confidence >= min_confidence
+    AND rule.lift >= min_lift:
+        add rule.consequents to candidates
+
+Deduplicate by item name (keep highest-lift rule per item)
+Sort by lift desc, then confidence desc
+Return top N
+```
 
 ### Fallback
-If no matching rules are found for the input items (e.g. item names don't appear
-in the Groceries vocabulary), the engine falls back to the global trending list
-(top items by lift across all rules).
+If no matching rules found → fall back to `trending()` (global top items by lift).
+
+---
+
+## Personalisation Service
+
+**File:** `ai-service/app/services/personalization.py`
+
+Queries per customer:
+1. **Recent items** — last 15 distinct items from last 10 orders
+2. **Favourite items** — top 10 items by order count
+3. **Favourite categories** — top 5 categories by order count
+4. **Visit count** — total completed orders
+5. **Time profile** — morning/afternoon/evening visit distribution
+
+**Reason priority:**
+1. `"You frequently order Espresso"` (if item in top favourites, ≥3 times)
+2. `"You love Coffee items"` (if item from favourite category)
+3. `"Popular morning choice"` (time-based, if time profile shows morning visits)
+4. Standard Apriori reason (Frequently Bought Together, etc.)
+
+**New customer fallback** (< 3 orders):
+- Returns trending items
+- Reason: `"Trending Now"`
+
+---
+
+## Model Versioning
+
+**File:** `ai-service/app/services/model_registry.py`
+
+```
+data/
+  models/
+    cafe_v20260630_120000_rules.joblib   ← v1
+    cafe_v20260630_162300_rules.joblib   ← v2 (active)
+  trained_rules.joblib                   ← copy of latest
+  metadata.json                          ← metadata for latest
+```
+
+All training sessions also logged to `ai_training_sessions` MySQL table:
+- version, dataset_source, n_rules, avg_confidence, avg_lift, training_time_sec, trained_at
+
+---
+
+## Training Parameters
+
+| Parameter        | Default | Notes                                        |
+|------------------|---------|----------------------------------------------|
+| `min_support`    | 0.02    | Adaptive: halved if < 200 transactions       |
+| `min_confidence` | 0.30    | Rules fire correctly ≥30% of the time         |
+| `max_len`        | 3       | Max itemset size (prevents explosion)        |
+| `min_lift`       | 1.0     | Applied at serve time per request            |
+
+Configurable via `.env`:
+```
+TRAIN_MIN_SUPPORT=0.02
+TRAIN_MIN_CONFIDENCE=0.30
+TRAIN_MAX_LEN=3
+```
 
 ---
 
 ## Lift Interpretation
 
-| Lift value | Meaning                                      |
-|------------|----------------------------------------------|
-| > 1.0      | Positive association — bought together more than by chance |
-| = 1.0      | Independent — no association                 |
-| < 1.0      | Negative association — rarely bought together |
+| Lift   | Meaning                                      |
+|--------|----------------------------------------------|
+| > 2.0  | Very strong positive association              |
+| 1.5–2.0| Strong positive association                  |
+| 1.1–1.5| Moderate positive association                |
+| 1.0    | Independent — no association                 |
+| < 1.0  | Negative — bought less often together        |
 
-All rules in the model have lift ≥ 1.0 (enforced by `min_lift=1.0` in `/recommend`).
-
----
-
-## Memory & Performance
-
-| Operation          | Time    | RAM delta |
-|--------------------|---------|-----------|
-| Preprocess         | ~1.6 s  | ~50 MB (released after encoding) |
-| Train (Apriori)    | ~0.2 s  | ~15 MB   |
-| Load model         | ~0.05 s | ~5 MB    |
-| Single /recommend  | <5 ms   | 0 MB     |
-
-The large `encoded` DataFrame is freed with `del encoded; gc.collect()` immediately
-after Apriori completes — it is not kept in RAM at serve time.
+**Demo data expected lift range:** 1.5–3.0 (strong, because combos are explicit)  
+**Real cafe orders expected lift range:** 1.2–2.5
 
 ---
 
-## Upgrade Path: Groceries → Cafe Orders
+## Scheduled Auto-Retrain
 
-This section explains how to replace the demo model with a production model
-trained on the cafe's own data.
+Configured via `.env`:
+```
+AUTO_RETRAIN_HOUR=3   # 3am daily. Set to 0 to disable.
+```
 
-### Why replace?
-The Groceries dataset contains grocery items (milk, bread, yogurt).  
-The actual cafe menu contains drinks, pastries, and food items.  
-The patterns are different — e.g. "Caramel Macchiato + Butter Croissant"  
-will not appear in the Groceries rules.
+Uses `APScheduler` (AsyncIOScheduler). Requires `apscheduler>=3.10.4`.
+If not installed, startup proceeds without scheduling.
 
-### What to do
+---
 
-1. **Export cafe transaction data**
-   ```sql
-   SELECT o.id AS order_id, oi.product_id, mi.name AS item_name
-   FROM orders o
-   JOIN order_items oi ON oi.order_id = o.id
-   JOIN menu_items mi  ON mi.id = oi.product_id
-   WHERE o.status = 'COMPLETED'
-   ORDER BY o.id;
-   ```
+## Transition: Demo → Production
 
-2. **Create `preprocess_cafe.py`**
-   - Group by `order_id` (one order = one basket)
-   - Each item in the order is one transaction item
-   - No need for member-level grouping — order baskets are already correct
+| Step | Action                                   | Code change needed? |
+|------|------------------------------------------|---------------------|
+| 1    | Admin clicks "Delete Demo Dataset"       | None                |
+| 2    | Real customers place orders via POS      | None                |
+| 3    | Admin clicks "Retrain AI"                | None                |
+| 4    | Engine reloads from new model            | None                |
+| 5    | `demo_notice` becomes empty string       | None                |
+| 6    | `source` field shows `cafe_v{timestamp}` | None                |
 
-3. **Train with adjusted parameters**
-   - Cafe orders will have fewer items per basket (~3–6) than member-level grocery baskets
-   - Lower `min_support` (e.g. 0.01) to compensate for smaller dataset
-   - Keep `min_confidence = 0.30`, `min_threshold = 1.0`
-
-4. **Save as `trained_rules_cafe.joblib`** and update `ai_engine.py` to load it
-
-5. **No API changes needed** — all endpoints stay identical.  
-   Only `source` field changes from `"apriori_groceries_v1"` to `"apriori_cafe_v1"`.
-
-6. **Remove `demo_notice`** from responses once the cafe model is deployed.
-
-> **Important:** Do NOT implement self-learning AI (reinforcement learning /
-> online updates) until explicitly approved. The current architecture is
-> batch-trained — retrain manually whenever new order data is available,
-> or schedule a weekly retrain job.
+**The API interface is completely stable across all phases.**

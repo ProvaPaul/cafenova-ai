@@ -1,0 +1,78 @@
+[33mcommit b4f2fa73981c2b95dff8e99bdbca3f2f2c291420[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+Commit: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+
+    feat: implement Phase 2 AI recommendation engine using Groceries dataset
+    
+    - Added Apriori-based association rule engine (mlxtend) with 797 rules
+    - preprocess.py: validates, groups by member, one-hot encodes dataset
+    - train.py: Apriori training (support=0.02, confidence=0.30, max_len=3)
+    - ai_engine.py: lazy singleton, recommend() / trending() / explain() / analytics()
+    - FastAPI: /recommend, /rules, /explain replace all dummy responses
+    - /analytics/ai returns real model stats (rules, avg_conf, avg_lift, training time)
+    - AiAnalyticsPanel.java: Admin AI Analytics page with rule table + KPI cards
+    - AdminDashboard.java: added AI Analytics sidebar nav item
+    - RecommendationCard.jsx: shows confidence, lift, support, Demo AI badge
+    - useRecommendations.js: updated for new response shape
+    - Spring Boot: RecommendationController, RecommendationService, SecurityConfig
+    - AiRecommendationServiceImpl.java: real FastAPI client with stub fallback
+    - docs/: API_DOCUMENTATION.md, AI_DOCUMENTATION.md, TRAINING_REPORT.md
+    - Upgrade path documented: Groceries model -> Cafe Orders model (Phase 3)
+    - Self-learning AI NOT implemented (awaiting approval per Phase 4)
+    
+    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+[33mcommit e70d21882abcedac6fe2afdd9fc7f50240d63b85[m
+Author: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+Commit: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+
+    feat: enhance admin panel with order lifecycle, inventory tracking, and realistic demo data
+    
+    - Add OrderManagementPanel with full NEW→PENDING→CONFIRMED→PREPARING→READY→SERVED→COMPLETED
+      workflow, role-gated status transitions, and inline item details pane
+    - Extend Order model with 3 new statuses, statusLabel/statusColor helpers for consistent UI
+    - Upgrade DashboardHomePanel: split into 2 stat-card rows (totals + active counts),
+      add Recent Orders table, Top Products table, and Low Stock alerts list
+    - Add InventoryPanel stock history tab and Restock dialog (records movement, updates stock)
+    - Add InventoryMovement and AppNotification models, DAOs, and services
+    - Add PermissionManager for centralised role-based access control on all modules and actions
+    - Extend DashboardServiceImpl to populate status breakdowns, recent orders, top products,
+      and low-stock items using the richer DashboardStats
+    - Wire new services (InventoryMovementService, NotificationService) into AppContext and Main
+    - Add AdminDashboard Orders panel entry in sidebar nav
+    - Add upgrade_v2.sql: extends orders.status ENUM, adds inventory_movements and
+      app_notifications tables, receipt_number/void_reason on payments
+    - Add seed_data.sql: 20 categories, 100 products, 8 suppliers, 25 inventory items,
+      10 employees, 30 customers, 36 orders across 30 days, 15 reservations, 4 notifications
+    
+    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+[33mcommit 41747da1ab5bfb5ec0dcad4c755f5c687eac2a9f[m
+Author: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+Commit: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+
+    feat: optimize project and prepare AI-ready architecture
+
+[33mcommit dcd08fe9d1c04c25d838114bec61a91b256364a7[m
+Author: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+Commit: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+
+    feat: added customer, employee, reports and reservations
+
+[33mcommit bed7e3436cdead40d075f0c6ec983eec05515441[m
+Author: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+Commit: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+
+    feat: implement inventory, POS and billing
+
+[33mcommit 86dff1402ee4f788d9e0811dfccd6b348c3f1f49[m
+Author: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+Commit: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+
+    feat: implement dashboard and product management
+
+[33mcommit bdc69d948d363fc59bdfeb0539e9ab088b3a93f8[m
+Author: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+Commit: ProvaPaul <paul2007037@stud.kuet.ac.bd>
+
+    feat: initialize project foundation and authentication module

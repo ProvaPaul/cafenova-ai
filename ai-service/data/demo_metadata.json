@@ -1,0 +1,21 @@
+{
+  "generated_at": "2026-06-30T10:48:49.294651",
+  "order_prefix": "DMO",
+  "customer_email_suffix": "@demo.smartcafe.local",
+  "category_names": [
+    "Coffee",
+    "Tea",
+    "Burger",
+    "Pizza",
+    "Pasta",
+    "Sandwich",
+    "Dessert",
+    "Juice",
+    "Soft Drinks",
+    "Snacks"
+  ],
+  "n_customers": 200,
+  "n_menu_items": 100,
+  "n_orders": 2500,
+  "n_order_items": 7227
+}

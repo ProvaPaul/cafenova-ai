@@ -67,6 +67,22 @@ public class RestApiClient {
         return response.body();
     }
 
+    public String delete(String endpoint) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(baseUrl + endpoint))
+                .timeout(Duration.ofSeconds(AiConfig.getReadTimeoutSeconds()))
+                .header("Accept", "application/json")
+                .DELETE()
+                .build();
+        HttpResponse<String> response = httpClient.send(request,
+                HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() >= 400) {
+            throw new IOException("AI API error " + response.statusCode()
+                    + ": " + response.body());
+        }
+        return response.body();
+    }
+
     /** Quick liveness check — used by {@code isAvailable()} in the real implementation. */
     public boolean isReachable() {
         try {

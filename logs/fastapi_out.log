@@ -1,0 +1,28 @@
+2026-07-01 01:08:35 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-07-01 01:08:35 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-07-01 01:08:35 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-07-01 01:08:35 | INFO     | app.main:31 — AI model loaded: 21 rules  version=cafe_v20260630_105842  source=DEMO_DATA
+2026-07-01 01:08:35 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+INFO:     127.0.0.1:53903 - "GET /health HTTP/1.1" 200 OK
+2026-07-01 01:09:12 | INFO     | app.routers.analytics:43 — GET /analytics/ai
+INFO:     127.0.0.1:63270 - "GET /api/v1/analytics/ai HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63270 - "GET /api/v1/admin/training-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63270 - "GET /api/v1/admin/ai-status HTTP/1.1" 200 OK
+2026-07-01 01:09:13 | INFO     | app.routers.analytics:43 — GET /analytics/ai
+INFO:     127.0.0.1:63274 - "GET /api/v1/analytics/ai HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63274 - "GET /api/v1/admin/training-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63274 - "GET /api/v1/admin/ai-status HTTP/1.1" 200 OK
+2026-07-01 01:25:52 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-07-01 01:25:52 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-07-01 01:25:52 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-07-01 01:25:52 | INFO     | app.main:31 — AI model loaded: 21 rules  version=cafe_v20260630_105842  source=DEMO_DATA
+2026-07-01 01:25:52 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-07-01 01:26:01 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-07-01 01:26:01 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-07-01 01:26:01 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-07-01 01:26:01 | INFO     | app.main:31 — AI model loaded: 21 rules  version=cafe_v20260630_105842  source=DEMO_DATA
+2026-07-01 01:26:01 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-07-01 01:52:26 | INFO     | app.routers.analytics:43 — GET /analytics/ai
+INFO:     127.0.0.1:60187 - "GET /api/v1/analytics/ai HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60187 - "GET /api/v1/admin/training-history HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60187 - "GET /api/v1/admin/ai-status HTTP/1.1" 200 OK

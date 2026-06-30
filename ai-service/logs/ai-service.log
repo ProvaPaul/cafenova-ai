@@ -1,0 +1,99 @@
+2026-06-30 15:47:28 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-06-30 15:47:28 | INFO     | app.main:18 — 🚀  SmartCafe AI Service v1.0.0 starting up
+2026-06-30 15:47:28 | INFO     | app.main:19 — 📍  http://0.0.0.0:8000
+2026-06-30 15:47:28 | INFO     | app.main:20 — ✅  AI Recommendation Service ready  (dummy engine — awaiting real ML)
+2026-06-30 15:47:41 | INFO     | app.routers.recommendations:22 — GET /trending  limit=3
+2026-06-30 16:00:02 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-06-30 16:00:02 | INFO     | app.main:19 — SmartCafe AI Service v1.0.0 starting up
+2026-06-30 16:00:02 | INFO     | app.main:20 — Listening on http://0.0.0.0:8000
+2026-06-30 16:00:02 | INFO     | app.main:27 — AI model loaded: 797 association rules ready
+2026-06-30 16:00:13 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-06-30 16:00:13 | INFO     | app.main:19 — SmartCafe AI Service v1.0.0 starting up
+2026-06-30 16:00:13 | INFO     | app.main:20 — Listening on http://0.0.0.0:8000
+2026-06-30 16:00:13 | INFO     | app.main:27 — AI model loaded: 797 association rules ready
+2026-06-30 16:00:16 | INFO     | app.routers.recommendations:70 — GET /trending  limit=3
+2026-06-30 16:00:16 | INFO     | app.routers.recommendations:91 — POST /recommend  items=['whole milk', 'yogurt']  limit=3
+2026-06-30 16:00:17 | INFO     | app.routers.analytics:43 — GET /analytics/ai
+2026-06-30 16:41:18 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-06-30 16:41:18 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-06-30 16:41:18 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-06-30 16:41:18 | INFO     | app.main:31 — AI model loaded: 797 rules  version=v?  source=unknown
+2026-06-30 16:41:18 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-06-30 16:47:03 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-06-30 16:47:03 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-06-30 16:47:03 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-06-30 16:47:03 | INFO     | app.main:31 — AI model loaded: 797 rules  version=v?  source=unknown
+2026-06-30 16:47:03 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-06-30 16:48:05 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-06-30 16:48:05 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-06-30 16:48:05 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-06-30 16:48:05 | INFO     | app.main:31 — AI model loaded: 797 rules  version=v?  source=unknown
+2026-06-30 16:48:05 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-06-30 16:53:51 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-06-30 16:53:51 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-06-30 16:53:51 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-06-30 16:53:51 | INFO     | app.main:31 — AI model loaded: 21 rules  version=cafe_v20260630_105031  source=DEMO_DATA
+2026-06-30 16:53:52 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-06-30 16:54:10 | INFO     | app.routers.recommendations:88 — GET /trending  limit=5
+2026-06-30 16:54:17 | INFO     | app.routers.recommendations:111 — POST /recommend  items=['Classic Burger', 'French Fries']  limit=5
+2026-06-30 16:54:18 | INFO     | app.routers.recommendations:111 — POST /recommend  items=['Espresso']  limit=3
+2026-06-30 16:54:25 | INFO     | app.routers.recommendations:164 — GET /personal/1  limit=5
+2026-06-30 16:54:26 | INFO     | app.routers.recommendations:130 — POST /rules  limit=10
+2026-06-30 16:54:32 | INFO     | app.routers.analytics:43 — GET /analytics/ai
+2026-06-30 16:55:27 | INFO     | app.routers.recommendations:111 — POST /recommend  items=['Espresso']  limit=5
+2026-06-30 16:56:11 | INFO     | app.routers.recommendations:111 — POST /recommend  items=['Espresso']  limit=5
+2026-06-30 16:56:11 | INFO     | app.routers.recommendations:111 — POST /recommend  items=['Classic Burger']  limit=5
+2026-06-30 16:57:22 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-06-30 16:57:22 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-06-30 16:57:22 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-06-30 16:57:22 | INFO     | app.main:31 — AI model loaded: 21 rules  version=cafe_v20260630_105031  source=DEMO_DATA
+2026-06-30 16:57:22 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-06-30 16:57:31 | INFO     | app.routers.recommendations:111 — POST /recommend  items=['Espresso']  limit=3
+2026-06-30 16:57:50 | INFO     | app.routers.recommendations:111 — POST /recommend  items=['Classic Burger']  limit=3
+2026-06-30 16:57:50 | INFO     | app.routers.recommendations:111 — POST /recommend  items=['Pepperoni Pizza']  limit=3
+2026-06-30 16:57:51 | INFO     | app.routers.recommendations:111 — POST /recommend  items=['Cheeseburger']  limit=3
+2026-06-30 16:57:51 | INFO     | app.routers.recommendations:111 — POST /recommend  items=['Chicken Burger']  limit=3
+2026-06-30 16:57:51 | INFO     | app.routers.recommendations:88 — GET /trending  limit=5
+2026-06-30 16:57:51 | INFO     | app.routers.recommendations:164 — GET /personal/1  limit=3
+2026-06-30 16:58:23 | INFO     | app.routers.recommendations:164 — GET /personal/53  limit=5
+2026-07-01 00:43:20 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-07-01 00:43:20 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-07-01 00:43:20 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-07-01 00:43:20 | INFO     | app.main:31 — AI model loaded: 21 rules  version=cafe_v20260630_105842  source=DEMO_DATA
+2026-07-01 00:43:20 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-07-01 00:48:16 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-07-01 00:48:16 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-07-01 00:48:16 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-07-01 00:48:16 | INFO     | app.main:31 — AI model loaded: 21 rules  version=cafe_v20260630_105842  source=DEMO_DATA
+2026-07-01 00:48:16 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-07-01 00:48:18 | INFO     | app.main:74 — Shutting down AI service
+2026-07-01 00:48:22 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-07-01 00:48:22 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-07-01 00:48:22 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-07-01 00:48:22 | INFO     | app.main:31 — AI model loaded: 21 rules  version=cafe_v20260630_105842  source=DEMO_DATA
+2026-07-01 00:48:22 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-07-01 00:54:09 | INFO     | app.routers.analytics:43 — GET /analytics/ai
+2026-07-01 01:03:01 | INFO     | app.routers.analytics:43 — GET /analytics/ai
+2026-07-01 01:08:35 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-07-01 01:08:35 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-07-01 01:08:35 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-07-01 01:08:35 | INFO     | app.main:31 — AI model loaded: 21 rules  version=cafe_v20260630_105842  source=DEMO_DATA
+2026-07-01 01:08:35 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-07-01 01:09:12 | INFO     | app.routers.analytics:43 — GET /analytics/ai
+2026-07-01 01:09:13 | INFO     | app.routers.analytics:43 — GET /analytics/ai
+2026-07-01 01:25:52 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-07-01 01:25:52 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-07-01 01:25:52 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-07-01 01:25:52 | INFO     | app.main:31 — AI model loaded: 21 rules  version=cafe_v20260630_105842  source=DEMO_DATA
+2026-07-01 01:25:52 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-07-01 01:26:01 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-07-01 01:26:01 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-07-01 01:26:01 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-07-01 01:26:01 | INFO     | app.main:31 — AI model loaded: 21 rules  version=cafe_v20260630_105842  source=DEMO_DATA
+2026-07-01 01:26:01 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-07-01 01:47:21 | INFO     | app.utils.logger:23 — Logging initialised at level=DEBUG
+2026-07-01 01:47:21 | INFO     | app.main:21 — SmartCafe AI Service v2.0.0 starting up
+2026-07-01 01:47:21 | INFO     | app.main:22 — Listening on http://0.0.0.0:8000
+2026-07-01 01:47:21 | INFO     | app.main:31 — AI model loaded: 21 rules  version=cafe_v20260630_105842  source=DEMO_DATA
+2026-07-01 01:47:21 | INFO     | app.main:66 — Auto-retrain scheduled at 03:00 daily
+2026-07-01 01:52:26 | INFO     | app.routers.analytics:43 — GET /analytics/ai

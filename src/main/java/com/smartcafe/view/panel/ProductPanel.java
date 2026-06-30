@@ -8,14 +8,22 @@ import com.smartcafe.model.Category;
 import com.smartcafe.model.Product;
 import com.smartcafe.view.components.RoundedButton;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Product CRUD panel — search, category filter, image thumbnails, add/edit/delete.
@@ -27,6 +35,16 @@ public class ProductPanel extends JPanel {
 
     private static final String[] COLUMNS = {"ID", "Image", "Name", "Category", "Price", "Available", "Status"};
     private static final int      IMG_ROW_HEIGHT = 56;
+
+    // Shared across all instances — async URL image loading
+    private static final Map<String, ImageIcon> IMG_CACHE   = new ConcurrentHashMap<>();
+    private static final Set<String>            IMG_LOADING = ConcurrentHashMap.newKeySet();
+    private static final ExecutorService        IMG_LOADER  =
+        Executors.newFixedThreadPool(4, r -> {
+            Thread t = new Thread(r, "Cafe-ImgLoader");
+            t.setDaemon(true);
+            return t;
+        });
 
     private final boolean readOnly;
 
@@ -49,9 +67,7 @@ public class ProductPanel extends JPanel {
 
         tableModel = new DefaultTableModel(COLUMNS, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
-            @Override public Class<?> getColumnClass(int col) {
-                return col == 1 ? ImageIcon.class : String.class;
-            }
+            @Override public Class<?> getColumnClass(int col) { return Object.class; }
         };
         table = buildTable();
 
@@ -190,7 +206,7 @@ public class ProductPanel extends JPanel {
             if (matchCat && matchQ) {
                 tableModel.addRow(new Object[]{
                     p.getId(),
-                    loadThumbnail(p.getImagePath()),
+                    p.getImagePath(),   // renderer fetches from cache or loads async
                     p.getName(),
                     p.getCategoryName() != null ? p.getCategoryName() : "—",
                     String.format("₱ %.2f", p.getPrice()),
@@ -242,15 +258,38 @@ public class ProductPanel extends JPanel {
         return allProducts.stream().filter(p -> p.getId() == id).findFirst().orElse(null);
     }
 
-    private static ImageIcon loadThumbnail(String imagePath) {
-        if (imagePath == null || imagePath.isBlank()) return null;
+    private static void fetchUrlImage(String url, JTable table) {
+        if (!IMG_LOADING.add(url)) return;
+        IMG_LOADER.submit(() -> {
+            try {
+                HttpURLConnection conn = (HttpURLConnection) new java.net.URL(url).openConnection();
+                conn.setRequestProperty("User-Agent", "SmartCafe/1.0 Java");
+                conn.setRequestProperty("Accept", "image/jpeg,image/png,image/*");
+                conn.setConnectTimeout(8000);
+                conn.setReadTimeout(15000);
+                conn.setInstanceFollowRedirects(true);
+                BufferedImage img = ImageIO.read(conn.getInputStream());
+                if (img != null) {
+                    Image scaled = img.getScaledInstance(48, 48, Image.SCALE_SMOOTH);
+                    IMG_CACHE.put(url, new ImageIcon(scaled));
+                    SwingUtilities.invokeLater(table::repaint);
+                }
+            } catch (Exception ignored) {
+            } finally {
+                IMG_LOADING.remove(url);
+            }
+        });
+    }
+
+    private static void fetchLocalImage(String path) {
+        if (IMG_CACHE.containsKey(path)) return;
         try {
-            java.io.File f = new java.io.File(imagePath);
-            if (!f.exists()) return null;
-            ImageIcon raw = new ImageIcon(imagePath);
+            java.io.File f = new java.io.File(path);
+            if (!f.exists()) return;
+            ImageIcon raw = new ImageIcon(path);
             Image scaled  = raw.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH);
-            return new ImageIcon(scaled);
-        } catch (Exception e) { return null; }
+            IMG_CACHE.put(path, new ImageIcon(scaled));
+        } catch (Exception ignored) {}
     }
 
     private Window parentWindow() { return SwingUtilities.getWindowAncestor(this); }
@@ -289,11 +328,21 @@ public class ProductPanel extends JPanel {
                     boolean sel, boolean focus, int row, int col) {
                 JLabel lbl = new JLabel();
                 lbl.setHorizontalAlignment(SwingConstants.CENTER);
-                if (value instanceof ImageIcon icon) {
+                String path = value instanceof String s ? s : null;
+                ImageIcon icon = (path != null && !path.isBlank()) ? IMG_CACHE.get(path) : null;
+                if (icon != null) {
                     lbl.setIcon(icon);
                 } else {
                     lbl.setText("📷");
                     lbl.setForeground(AppConfig.COLOR_TEXT_HINT);
+                    if (path != null && !path.isBlank()
+                            && (path.startsWith("http://") || path.startsWith("https://"))) {
+                        fetchUrlImage(path, tbl);
+                    } else if (path != null && !path.isBlank()) {
+                        fetchLocalImage(path);
+                        ImageIcon local = IMG_CACHE.get(path);
+                        if (local != null) lbl.setIcon(local);
+                    }
                 }
                 lbl.setBackground(sel ? tbl.getSelectionBackground() : tbl.getBackground());
                 lbl.setOpaque(true);

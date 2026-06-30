@@ -95,9 +95,9 @@ class _Engine:
         normalised = {i.strip().lower() for i in items}
         rules = self._rules
 
-        # Filter: antecedents must be a subset of the input items
+        # Filter: antecedents must be a subset of the input items (case-insensitive)
         mask = rules["antecedents"].apply(
-            lambda ant: set(ant).issubset(normalised)
+            lambda ant: {a.lower() for a in ant}.issubset(normalised)
         ) & (rules["confidence"] >= min_confidence) & (rules["lift"] >= min_lift)
 
         matching = rules[mask].copy()
@@ -109,7 +109,7 @@ class _Engine:
         results: dict[str, dict[str, Any]] = {}
         for _, row in matching.iterrows():
             for item in row["consequents"]:
-                if item in normalised:
+                if item.lower() in normalised:
                     continue  # skip items already in cart
                 existing = results.get(item)
                 if existing is None or row["lift"] > existing["lift"]:

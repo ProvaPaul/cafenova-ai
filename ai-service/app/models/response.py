@@ -16,11 +16,12 @@ class AiRecommendation(BaseModel):
 class RecommendResponse(BaseModel):
     success: bool = True
     source: str = "apriori_groceries_v1"
-    demo_notice: str = "Demo AI — trained on public Groceries dataset. Will be replaced with cafe-specific model."
+    demo_notice: str = ""
     input_items: list[str] = []
     recommendations: list[AiRecommendation]
     total: int
     generated_at: str
+    extra: dict[str, Any] = {}
 
 
 class RuleItem(BaseModel):

@@ -1,0 +1,68 @@
+{
+  "total_rows": 38765,
+  "total_transactions": 3892,
+  "unique_items": 167,
+  "avg_basket_size": 8.931,
+  "date_range": {
+    "start": "2014-01-01",
+    "end": "2015-12-30"
+  },
+  "top_10_items": [
+    {
+      "item": "whole milk",
+      "count": 2502,
+      "support": 0.4586
+    },
+    {
+      "item": "other vegetables",
+      "count": 1898,
+      "support": 0.3767
+    },
+    {
+      "item": "rolls/buns",
+      "count": 1716,
+      "support": 0.3502
+    },
+    {
+      "item": "soda",
+      "count": 1514,
+      "support": 0.3137
+    },
+    {
+      "item": "yogurt",
+      "count": 1334,
+      "support": 0.2834
+    },
+    {
+      "item": "root vegetables",
+      "count": 1071,
+      "support": 0.231
+    },
+    {
+      "item": "tropical fruit",
+      "count": 1032,
+      "support": 0.2341
+    },
+    {
+      "item": "bottled water",
+      "count": 933,
+      "support": 0.214
+    },
+    {
+      "item": "sausage",
+      "count": 924,
+      "support": 0.2063
+    },
+    {
+      "item": "citrus fruit",
+      "count": 812,
+      "support": 0.1858
+    }
+  ],
+  "support_stats": {
+    "max": 0.4586,
+    "min": 0.0003,
+    "mean": 0.0535,
+    "median": 0.0218
+  }
+}

@@ -34,14 +34,14 @@ public class AiRecommendationServiceImpl implements AiRecommendationService {
     @Override
     public List<MenuRecommendationDto> getMenuRecommendations() {
         try {
-            String json = client.get("/recommendations/trending?limit=5");
+            String json = client.get("/api/v1/recommendations/trending?limit=5");
             JSONObject obj  = new JSONObject(json);
             JSONArray  recs = obj.getJSONArray("recommendations");
             List<MenuRecommendationDto> result = new ArrayList<>();
             for (int i = 0; i < recs.length(); i++) {
                 JSONObject r = recs.getJSONObject(i);
                 result.add(new MenuRecommendationDto(
-                    r.getString("name"),
+                    r.optString("recommendation", r.optString("name", "Unknown")),
                     r.getDouble("confidence"),
                     r.getString("reason")
                 ));

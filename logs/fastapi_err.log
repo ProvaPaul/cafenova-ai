@@ -1,0 +1,27 @@
+INFO:     Will watch for changes in these directories: ['C:\\Users\\User\\OneDrive\\Desktop\\projects\\Smart Cafe Management System\\ai-service']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [20068] using WatchFiles
+INFO:     Started server process [3248]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  Unsupported upgrade request.
+WARNING:  Unsupported upgrade request.
+WARNING:  Unsupported upgrade request.
+WARNING:  Unsupported upgrade request.
+WARNING:  Unsupported upgrade request.
+WARNING:  Unsupported upgrade request.
+WARNING:  Unsupported upgrade request.
+WARNING:  WatchFiles detected changes in 'scripts\generate_demo_data.py'. Reloading...
+INFO:     Started server process [8160]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  Unsupported upgrade request.
+WARNING:  WatchFiles detected changes in 'scripts\generate_demo_data.py'. Reloading...
+INFO:     Started server process [18140]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  Unsupported upgrade request.
+WARNING:  Unsupported upgrade request.
+WARNING:  Unsupported upgrade request.
+WARNING:  Unsupported upgrade request.
+WARNING:  Invalid HTTP request received.
