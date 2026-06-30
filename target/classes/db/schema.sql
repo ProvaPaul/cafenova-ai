@@ -249,3 +249,109 @@ INSERT IGNORE INTO cafe_tables (table_number, capacity, location) VALUES
     ('T01', 2, 'Indoor'), ('T02', 2, 'Indoor'), ('T03', 4, 'Indoor'),
     ('T04', 4, 'Indoor'), ('T05', 6, 'Indoor'), ('T06', 6, 'Indoor'),
     ('T07', 4, 'Outdoor'),('T08', 4, 'Outdoor'),('V01', 8, 'VIP');
+
+
+-- ─── STEP 4: CUSTOMERS ───────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS customers (
+    id             INT            NOT NULL AUTO_INCREMENT,
+    full_name      VARCHAR(100)   NOT NULL,
+    phone          VARCHAR(20)    NULL,
+    email          VARCHAR(100)   NULL,
+    address        TEXT           NULL,
+    loyalty_points INT            NOT NULL DEFAULT 0,
+    total_spent    DECIMAL(12,2)  NOT NULL DEFAULT 0.00,
+    visit_count    INT            NOT NULL DEFAULT 0,
+    is_active      BOOLEAN        NOT NULL DEFAULT TRUE,
+    created_at     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_customer_phone (phone)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ─── STEP 4: EMPLOYEES ───────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS employees (
+    id           INT            NOT NULL AUTO_INCREMENT,
+    full_name    VARCHAR(100)   NOT NULL,
+    phone        VARCHAR(20)    NULL,
+    email        VARCHAR(100)   NULL,
+    address      TEXT           NULL,
+    position     VARCHAR(100)   NULL,
+    department   VARCHAR(100)   NULL,
+    base_salary  DECIMAL(10,2)  NOT NULL DEFAULT 0.00,
+    hire_date    DATE           NULL,
+    is_active    BOOLEAN        NOT NULL DEFAULT TRUE,
+    user_id      INT            NULL,
+    created_at   TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    CONSTRAINT fk_emp_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ─── STEP 4: ATTENDANCE ──────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS attendance (
+    id          INT         NOT NULL AUTO_INCREMENT,
+    employee_id INT         NOT NULL,
+    date        DATE        NOT NULL,
+    time_in     TIME        NULL,
+    time_out    TIME        NULL,
+    status      ENUM('PRESENT','ABSENT','LATE','HALF_DAY','LEAVE') NOT NULL DEFAULT 'PRESENT',
+    notes       VARCHAR(255) NULL,
+    created_at  TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_att_emp_date (employee_id, date),
+    CONSTRAINT fk_att_emp FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ─── STEP 4: SALARY PAYMENTS ─────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS salary_payments (
+    id           INT            NOT NULL AUTO_INCREMENT,
+    employee_id  INT            NOT NULL,
+    period_month TINYINT        NOT NULL,
+    period_year  SMALLINT       NOT NULL,
+    base_salary  DECIMAL(10,2)  NOT NULL DEFAULT 0.00,
+    bonus        DECIMAL(10,2)  NOT NULL DEFAULT 0.00,
+    deductions   DECIMAL(10,2)  NOT NULL DEFAULT 0.00,
+    net_salary   DECIMAL(10,2)  NOT NULL DEFAULT 0.00,
+    status       ENUM('PENDING','PAID') NOT NULL DEFAULT 'PENDING',
+    paid_at      TIMESTAMP      NULL,
+    notes        VARCHAR(255)   NULL,
+    created_at   TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_sal_period (employee_id, period_month, period_year),
+    CONSTRAINT fk_sal_emp FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ─── STEP 4: RESERVATIONS ────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS reservations (
+    id               INT            NOT NULL AUTO_INCREMENT,
+    table_id         INT            NULL,
+    customer_id      INT            NULL,
+    customer_name    VARCHAR(100)   NOT NULL,
+    party_size       INT            NOT NULL DEFAULT 1,
+    reservation_date DATE           NOT NULL,
+    reservation_time TIME           NOT NULL,
+    status           ENUM('PENDING','CONFIRMED','CANCELLED','COMPLETED','NO_SHOW') NOT NULL DEFAULT 'PENDING',
+    notes            TEXT           NULL,
+    created_at       TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    INDEX idx_res_date   (reservation_date),
+    INDEX idx_res_status (status),
+    CONSTRAINT fk_res_table    FOREIGN KEY (table_id)    REFERENCES cafe_tables(id) ON DELETE SET NULL,
+    CONSTRAINT fk_res_customer FOREIGN KEY (customer_id) REFERENCES customers(id)   ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Link orders to customers (safe migration)
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_id INT NULL AFTER customer_name;

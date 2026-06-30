@@ -150,8 +150,6 @@ public class BillHistoryPanel extends JPanel {
         center.add(new JScrollPane(table),      BorderLayout.CENTER);
         center.add(countLbl,                    BorderLayout.SOUTH);
         add(center, BorderLayout.CENTER);
-
-        loadData();
     }
 
     // ── Data ─────────────────────────────────────────────────────────────────

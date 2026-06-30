@@ -68,6 +68,23 @@ public class Main {
 
         AppContext.initializeStep3(supplierService, inventoryService, orderService, billingService);
 
+        // Step 4 DAOs + Services (Customer, Employee, Attendance, Salary, Reservation, Report)
+        com.smartcafe.dao.impl.CustomerDaoImpl     customerDao     = new com.smartcafe.dao.impl.CustomerDaoImpl();
+        com.smartcafe.dao.impl.EmployeeDaoImpl     employeeDao     = new com.smartcafe.dao.impl.EmployeeDaoImpl();
+        com.smartcafe.dao.impl.AttendanceDaoImpl   attendanceDao   = new com.smartcafe.dao.impl.AttendanceDaoImpl();
+        com.smartcafe.dao.impl.SalaryPaymentDaoImpl salaryDao      = new com.smartcafe.dao.impl.SalaryPaymentDaoImpl();
+        com.smartcafe.dao.impl.ReservationDaoImpl  reservationDao  = new com.smartcafe.dao.impl.ReservationDaoImpl();
+
+        com.smartcafe.service.impl.CustomerServiceImpl    customerService4   = new com.smartcafe.service.impl.CustomerServiceImpl(customerDao);
+        com.smartcafe.service.impl.EmployeeServiceImpl    employeeService4   = new com.smartcafe.service.impl.EmployeeServiceImpl(employeeDao);
+        com.smartcafe.service.impl.AttendanceServiceImpl  attendanceService4 = new com.smartcafe.service.impl.AttendanceServiceImpl(attendanceDao);
+        com.smartcafe.service.impl.SalaryServiceImpl      salaryService4     = new com.smartcafe.service.impl.SalaryServiceImpl(salaryDao);
+        com.smartcafe.service.impl.ReservationServiceImpl reservationService4= new com.smartcafe.service.impl.ReservationServiceImpl(reservationDao);
+        com.smartcafe.service.impl.ReportServiceImpl      reportService4     = new com.smartcafe.service.impl.ReportServiceImpl();
+
+        AppContext.initializeStep4(customerService4, employeeService4, attendanceService4,
+                                   salaryService4, reservationService4, reportService4);
+
         // ④ Build and show UI on the EDT
         SwingUtilities.invokeLater(() -> {
             MainFrame frame = new MainFrame();

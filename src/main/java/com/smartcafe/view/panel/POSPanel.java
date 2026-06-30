@@ -96,8 +96,6 @@ public class POSPanel extends JPanel {
         mainSplit.setResizeWeight(1.0);
         mainSplit.setDividerLocation(780);
         add(mainSplit, BorderLayout.CENTER);
-
-        loadData();
     }
 
     // ── Header ────────────────────────────────────────────────────────────────

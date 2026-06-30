@@ -126,8 +126,6 @@ public class InventoryPanel extends JPanel {
         });
         invTable.addMouseListener(doubleClickEdit(() -> { InventoryItem it = getSelectedItem(); if (it != null) openInvForm(it); }));
         supTable.addMouseListener(doubleClickEdit(() -> { Supplier s = getSelectedSupplier(); if (s != null) openSupForm(s); }));
-
-        loadData();
     }
 
     // ── Data loading ──────────────────────────────────────────────────────────
