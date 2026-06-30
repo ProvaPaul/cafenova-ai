@@ -95,6 +95,13 @@
             <artifactId>jfreechart</artifactId>
             <version>1.5.4</version>
         </dependency>
+
+        <!-- org.json: lightweight JSON parser for AI service responses -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20240303</version>
+        </dependency>
     </dependencies>
 
     <build>

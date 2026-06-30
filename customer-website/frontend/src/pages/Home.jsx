@@ -1,8 +1,15 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useRecommendations } from '../hooks/useRecommendations'
+import RecommendationCard from '../components/RecommendationCard'
 
 export default function Home() {
   const { user } = useAuth()
+  const { items: trending, loading: trendLoad } = useRecommendations('trending', { limit: 5 })
+  const { items: personal, loading: perLoad }   = useRecommendations(
+    user ? 'personal' : 'trending',
+    { limit: 5, ctx: 'home' }
+  )
 
   return (
     <div>
@@ -51,6 +58,39 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* Trending Now */}
+      <section className="max-w-7xl mx-auto px-4 py-12">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Trending Now</h2>
+            <p className="text-gray-500 text-sm mt-0.5">Most ordered items this week</p>
+          </div>
+          <Link to="/menu" className="text-cafe-600 text-sm hover:underline">View all →</Link>
+        </div>
+        {trendLoad
+          ? <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">{[...Array(5)].map((_,i)=><div key={i} className="h-52 bg-gray-100 rounded-xl animate-pulse"/>)}</div>
+          : <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">{trending.map(it=><RecommendationCard key={it.id} item={it}/>)}</div>
+        }
+      </section>
+
+      {/* Recommended for You */}
+      {user && (
+        <section className="bg-cafe-50 py-12 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Recommended for You</h2>
+                <p className="text-gray-500 text-sm mt-0.5">Based on your order history</p>
+              </div>
+            </div>
+            {perLoad
+              ? <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">{[...Array(5)].map((_,i)=><div key={i} className="h-52 bg-white rounded-xl animate-pulse"/>)}</div>
+              : <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">{personal.map(it=><RecommendationCard key={it.id} item={it}/>)}</div>
+            }
+          </div>
+        </section>
+      )}
 
       {/* Loyalty tiers */}
       <section className="bg-cafe-50 py-16 px-4">

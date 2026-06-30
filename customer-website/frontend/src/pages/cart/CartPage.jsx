@@ -1,9 +1,19 @@
 import { useCart } from '../../contexts/CartContext'
 import { Link, useNavigate } from 'react-router-dom'
+import { useRecommendations } from '../../hooks/useRecommendations'
+import RecommendationCard from '../../components/RecommendationCard'
 
 export default function CartPage() {
   const { cart, total, updateQuantity, removeItem, clearCart } = useCart()
   const navigate = useNavigate()
+
+  const cartIds   = cart.map(c => c.menuItem?.id).filter(Boolean)
+  const cartNames = cart.map(c => c.menuItem?.name).filter(Boolean)
+  const { items: suggestions } = useRecommendations('cart', {
+    productIds:   cartIds,
+    productNames: cartNames,
+    limit:        4,
+  })
 
   if (cart.length === 0) return (
     <div className="max-w-2xl mx-auto px-4 py-20 text-center">
@@ -69,6 +79,17 @@ export default function CartPage() {
           </Link>
         </div>
       </div>
+    </div>
+
+      {/* You May Also Like */}
+      {suggestions.length > 0 && (
+        <div className="mt-12">
+          <h2 className="font-bold text-xl text-gray-900 mb-4">You May Also Like</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {suggestions.map(it => <RecommendationCard key={it.id} item={it} />)}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

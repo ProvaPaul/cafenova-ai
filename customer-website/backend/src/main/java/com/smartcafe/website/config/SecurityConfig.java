@@ -40,6 +40,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 .requestMatchers("/api/feedback/public/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reservations/tables").permitAll()
+                .requestMatchers(HttpMethod.GET,  "/api/recommendations/trending").permitAll()
+                .requestMatchers(HttpMethod.GET,  "/api/recommendations/similar/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/recommendations/recommend").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

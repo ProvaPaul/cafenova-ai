@@ -1,0 +1,16 @@
+{
+  "algorithm": "apriori",
+  "dataset": "Groceries Dataset (public \u2014 Market Basket Analysis)",
+  "min_support": 0.02,
+  "min_confidence": 0.3,
+  "max_len": 3,
+  "n_frequent_itemsets": 876,
+  "n_rules": 797,
+  "avg_confidence": 0.4417,
+  "avg_lift": 1.2068,
+  "avg_support": 0.036916,
+  "training_time_seconds": 0.16,
+  "trained_at": "2026-06-30T15:56:30",
+  "model_file": "C:\\Users\\User\\OneDrive\\Desktop\\projects\\Smart Cafe Management System\\ai-service\\data\\trained_rules.joblib",
+  "note": "Trained on public Groceries dataset for validation. Will be replaced by a model trained on Cafe Orders and OrderItems tables."
+}

@@ -26,21 +26,23 @@ public class AdminDashboard extends JPanel {
     private static final String K_EMPLOYEES = "EMPLOYEES";
     private static final String K_RESERVE   = "RESERVATIONS";
     private static final String K_REPORTS   = "REPORTS";
+    private static final String K_AI        = "AI_ANALYTICS";
     private static final String K_SETTINGS  = "SETTINGS";
 
     private static final Object[][] NAV = {
-        {"🏠",  "Dashboard",     K_HOME},
-        {"🏷",  "Categories",    K_CATS},
-        {"📦",  "Products",      K_PRODUCTS},
-        {"🖥️", "POS",            K_POS},
-        {"📋",  "Orders",        K_ORDERS},
-        {"🏭",  "Inventory",     K_INVENTORY},
-        {"💳",  "Billing",       K_BILLING},
-        {"👥",  "Customers",     K_CUSTOMERS},
-        {"👔",  "Employees",     K_EMPLOYEES},
-        {"📅",  "Reservations",  K_RESERVE},
-        {"📊",  "Reports",       K_REPORTS},
-        {"⚙️",  "Settings",      K_SETTINGS},
+        {"🏠", "Dashboard",    K_HOME},
+        {"🏷", "Categories",   K_CATS},
+        {"📦", "Products",     K_PRODUCTS},
+        {"🖥", "POS",          K_POS},
+        {"📋", "Orders",       K_ORDERS},
+        {"🏭", "Inventory",    K_INVENTORY},
+        {"💳", "Billing",      K_BILLING},
+        {"👥", "Customers",    K_CUSTOMERS},
+        {"👔", "Employees",    K_EMPLOYEES},
+        {"📅", "Reservations", K_RESERVE},
+        {"📊", "Reports",      K_REPORTS},
+        {"🤖", "AI Analytics", K_AI},
+        {"⚙",        "Settings",     K_SETTINGS},
     };
 
     private final AuthController controller;
@@ -58,6 +60,7 @@ public class AdminDashboard extends JPanel {
     private EmployeePanel         employeePanel;
     private ReservationPanel      reservationPanel;
     private ReportPanel           reportPanel;
+    private AiAnalyticsPanel      aiAnalyticsPanel;
     private SettingsPanel         settingsPanel;
     private SidebarButton[]       sidebarBtns;
 
@@ -85,6 +88,7 @@ public class AdminDashboard extends JPanel {
         employeePanel    = new EmployeePanel();
         reservationPanel = new ReservationPanel();
         reportPanel      = new ReportPanel();
+        aiAnalyticsPanel = new AiAnalyticsPanel();
         settingsPanel    = new SettingsPanel();
 
         contentArea.add(homePanel,        K_HOME);
@@ -98,6 +102,7 @@ public class AdminDashboard extends JPanel {
         contentArea.add(employeePanel,    K_EMPLOYEES);
         contentArea.add(reservationPanel, K_RESERVE);
         contentArea.add(reportPanel,      K_REPORTS);
+        contentArea.add(aiAnalyticsPanel, K_AI);
         contentArea.add(settingsPanel,    K_SETTINGS);
 
         cardLayout.show(contentArea, K_HOME);
@@ -117,6 +122,7 @@ public class AdminDashboard extends JPanel {
             case K_EMPLOYEES -> employeePanel.loadData();
             case K_RESERVE   -> reservationPanel.loadData();
             case K_REPORTS   -> reportPanel.loadData();
+            case K_AI        -> aiAnalyticsPanel.loadData();
             case K_SETTINGS  -> settingsPanel.loadData();
         }
     }

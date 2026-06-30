@@ -157,6 +157,88 @@ public class POSPanel extends JPanel {
         return sp;
     }
 
+    // ── AI "You May Also Like" panel ─────────────────────────────────────────
+    private JPanel aiItemPanel; // populated by refreshAiRecommendations()
+
+    private JPanel buildAiPanel() {
+        JLabel title = new JLabel("You May Also Like");
+        title.setFont(new Font(AppConfig.FONT_LABEL.getName(), Font.BOLD, AppConfig.FONT_LABEL.getSize()));
+        title.setForeground(AppConfig.COLOR_TEXT_PRIMARY);
+        title.setBorder(new EmptyBorder(6, 14, 4, 14));
+
+        aiItemPanel = new JPanel();
+        aiItemPanel.setOpaque(false);
+        aiItemPanel.setLayout(new BoxLayout(aiItemPanel, BoxLayout.Y_AXIS));
+        aiItemPanel.setBorder(new EmptyBorder(0, 10, 6, 10));
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(new Color(0xFFF8F0));
+        wrapper.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, AppConfig.COLOR_BORDER));
+        wrapper.add(title,       BorderLayout.NORTH);
+        wrapper.add(aiItemPanel, BorderLayout.CENTER);
+        return wrapper;
+    }
+
+    private void refreshAiRecommendations() {
+        if (aiItemPanel == null) return;
+        new SwingWorker<List<com.smartcafe.ai.dto.MenuRecommendationDto>, Void>() {
+            @Override protected List<com.smartcafe.ai.dto.MenuRecommendationDto> doInBackground() {
+                try { return AppContext.aiService().getMenuRecommendations(); }
+                catch (Exception e) { return List.of(); }
+            }
+            @Override protected void done() {
+                aiItemPanel.removeAll();
+                try {
+                    List<com.smartcafe.ai.dto.MenuRecommendationDto> recs = get();
+                    for (com.smartcafe.ai.dto.MenuRecommendationDto r : recs) {
+                        aiItemPanel.add(buildAiItemRow(r));
+                        aiItemPanel.add(Box.createVerticalStrut(4));
+                    }
+                } catch (Exception ignored) {}
+                aiItemPanel.revalidate(); aiItemPanel.repaint();
+            }
+        }.execute();
+    }
+
+    private JPanel buildAiItemRow(com.smartcafe.ai.dto.MenuRecommendationDto r) {
+        JPanel row = new JPanel(new BorderLayout(8, 0));
+        row.setOpaque(false);
+        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 46));
+
+        JLabel icon = new JLabel("☕");
+        icon.setFont(new Font("Dialog", Font.PLAIN, 16));
+        icon.setPreferredSize(new Dimension(24, 0));
+
+        JPanel info = new JPanel();
+        info.setOpaque(false);
+        info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
+        JLabel nameLbl = new JLabel(r.itemName());
+        nameLbl.setFont(AppConfig.FONT_SMALL);
+        nameLbl.setForeground(AppConfig.COLOR_TEXT_PRIMARY);
+        int pct = (int) Math.round(r.confidenceScore() * 100);
+        JLabel confLbl = new JLabel(r.reason() + "  •  " + pct + "% match");
+        confLbl.setFont(new Font(AppConfig.FONT_SMALL.getName(), Font.PLAIN, 10));
+        confLbl.setForeground(AppConfig.COLOR_TEXT_SECONDARY);
+        info.add(nameLbl); info.add(confLbl);
+
+        RoundedButton addBtn = new RoundedButton("+", RoundedButton.Style.SECONDARY);
+        addBtn.setFont(AppConfig.FONT_SMALL);
+        addBtn.setPreferredSize(new Dimension(32, 28));
+        addBtn.setToolTipText("Add " + r.itemName() + " to cart");
+        addBtn.addActionListener(ev -> {
+            // Find the product by name and add it to cart
+            allProducts.stream()
+                .filter(p -> p.getName().equalsIgnoreCase(r.itemName()) && p.isActive())
+                .findFirst()
+                .ifPresent(POSPanel.this::addToCart);
+        });
+
+        row.add(icon,   BorderLayout.WEST);
+        row.add(info,   BorderLayout.CENTER);
+        row.add(addBtn, BorderLayout.EAST);
+        return row;
+    }
+
     // ── Cart panel ────────────────────────────────────────────────────────────
 
     private JPanel buildCartPanel() {
@@ -190,7 +272,13 @@ public class POSPanel extends JPanel {
         hdr.add(clearBtn,  BorderLayout.EAST);
 
         JScrollPane scroll = new JScrollPane(cartTable);
-        scroll.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, AppConfig.COLOR_BORDER));
+        scroll.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, AppConfig.COLOR_BORDER));
+
+        // Center = cart scroll on top, AI recommendations below
+        JPanel center = new JPanel(new BorderLayout());
+        center.setOpaque(false);
+        center.add(scroll,        BorderLayout.CENTER);
+        center.add(buildAiPanel(), BorderLayout.SOUTH);
 
         JPanel bottom = new JPanel(new BorderLayout());
         bottom.setOpaque(false);
@@ -203,7 +291,7 @@ public class POSPanel extends JPanel {
         panel.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, AppConfig.COLOR_BORDER));
         panel.setPreferredSize(new Dimension(310, 0));
         panel.add(hdr,    BorderLayout.NORTH);
-        panel.add(scroll, BorderLayout.CENTER);
+        panel.add(center, BorderLayout.CENTER);
         panel.add(bottom, BorderLayout.SOUTH);
         return panel;
     }
@@ -422,6 +510,7 @@ public class POSPanel extends JPanel {
         }
         rebuildCategorySidebar();
         applyFilter();
+        refreshAiRecommendations();
     }
 
     private void applyFilter() {

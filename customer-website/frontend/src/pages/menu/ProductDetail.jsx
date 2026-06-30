@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import api from '../../api/client'
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
+import { useRecommendations } from '../../hooks/useRecommendations'
+import RecommendationCard from '../../components/RecommendationCard'
 import toast from 'react-hot-toast'
 
 export default function ProductDetail() {
@@ -13,6 +15,13 @@ export default function ProductDetail() {
   const { addItem }           = useCart()
   const { user }              = useAuth()
   const navigate              = useNavigate()
+
+  const { items: similar } = useRecommendations('similar', {
+    productId: Number(id),
+    name:      item?.name,
+    category:  item?.categoryName,
+    limit:     4,
+  })
 
   useEffect(() => {
     api.get(`/menu/${id}`).then(r => setItem(r.data.data))
@@ -59,6 +68,16 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
+
+      {/* Frequently Bought Together */}
+      {similar.length > 0 && (
+        <div className="mt-10">
+          <h2 className="font-bold text-xl text-gray-900 mb-4">Frequently Bought Together</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {similar.map(it => <RecommendationCard key={it.id} item={it} />)}
+          </div>
+        </div>
+      )}
 
       {/* Reviews */}
       {reviews.length > 0 && (
