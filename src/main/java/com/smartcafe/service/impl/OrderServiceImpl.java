@@ -81,4 +81,19 @@ public class OrderServiceImpl implements OrderService {
     public List<Order> findRecent(int limit) {
         return orderDao.findAll(limit);
     }
+
+    @Override
+    public List<Order> findAll() {
+        return orderDao.findAll(1000);
+    }
+
+    @Override
+    public void updateStatus(int orderId, String newStatus) {
+        orderDao.updateStatus(orderId, newStatus);
+    }
+
+    @Override
+    public List<OrderItem> findItemsByOrderId(int orderId) {
+        return orderDao.findItemsByOrderId(orderId);
+    }
 }

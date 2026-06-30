@@ -5,7 +5,10 @@ import com.smartcafe.config.AppConfig;
 import com.smartcafe.config.AppContext;
 import com.smartcafe.exception.AppException;
 import com.smartcafe.model.InventoryItem;
+import com.smartcafe.model.InventoryMovement;
 import com.smartcafe.model.Supplier;
+import com.smartcafe.util.PermissionManager;
+import com.smartcafe.util.SessionManager;
 import com.smartcafe.view.components.RoundedButton;
 
 import javax.swing.*;
@@ -14,6 +17,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.*;
 import java.awt.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +33,7 @@ public class InventoryPanel extends JPanel {
     private final DefaultTableModel invModel;
     private final JTable            invTable;
     private final JTextField        invSearch;
-    private final JButton           invEdit, invDelete;
+    private final JButton           invEdit, invDelete, invRestock;
     private final JLabel            alertLbl;
     private       List<InventoryItem> allItems = new ArrayList<>();
 
@@ -40,6 +44,12 @@ public class InventoryPanel extends JPanel {
     private final JTextField        supSearch;
     private final JButton           supEdit, supDelete;
     private       List<Supplier>    allSuppliers = new ArrayList<>();
+
+    // ── Stock History tab ─────────────────────────────────────────────────────
+    private static final String[] HIST_COLS = {"Date/Time", "Item", "Type", "Qty", "Before", "After", "Notes", "By"};
+    private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("MMM d HH:mm");
+    private final DefaultTableModel histModel;
+    private final JTable            histTable;
 
     public InventoryPanel() {
         setBackground(AppConfig.COLOR_BG);
@@ -84,16 +94,23 @@ public class InventoryPanel extends JPanel {
         };
         supTable = buildTable(supModel);
 
-        // ── Search + buttons for inventory ────────────────────────────────────
-        invSearch = searchField("Search items…");
-        invEdit   = new RoundedButton("✏  Edit",   RoundedButton.Style.SECONDARY);
-        invDelete = new RoundedButton("🗑  Delete", RoundedButton.Style.DANGER);
-        RoundedButton invAdd = new RoundedButton("+ Add Item", RoundedButton.Style.PRIMARY);
-        invEdit.setEnabled(false); invDelete.setEnabled(false);
+        histModel = new DefaultTableModel(HIST_COLS, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
+        histTable = buildTable(histModel);
 
-        invAdd.addActionListener(e    -> openInvForm(null));
-        invEdit.addActionListener(e   -> { InventoryItem it = getSelectedItem(); if (it != null) openInvForm(it); });
-        invDelete.addActionListener(e -> deleteItem());
+        // ── Search + buttons for inventory ────────────────────────────────────
+        invSearch  = searchField("Search items…");
+        invEdit    = new RoundedButton("✏  Edit",     RoundedButton.Style.SECONDARY);
+        invDelete  = new RoundedButton("🗑  Delete",  RoundedButton.Style.DANGER);
+        invRestock = new RoundedButton("📦 Restock",  RoundedButton.Style.GHOST);
+        RoundedButton invAdd = new RoundedButton("+ Add Item", RoundedButton.Style.PRIMARY);
+        invEdit.setEnabled(false); invDelete.setEnabled(false); invRestock.setEnabled(false);
+
+        invAdd.addActionListener(e     -> openInvForm(null));
+        invEdit.addActionListener(e    -> { InventoryItem it = getSelectedItem(); if (it != null) openInvForm(it); });
+        invDelete.addActionListener(e  -> deleteItem());
+        invRestock.addActionListener(e -> restockItem());
         invSearch.getDocument().addDocumentListener(filterListener(this::applyInvFilter));
 
         // ── Search + buttons for suppliers ────────────────────────────────────
@@ -111,14 +128,16 @@ public class InventoryPanel extends JPanel {
         // ── Tabs ──────────────────────────────────────────────────────────────
         JTabbedPane tabs = new JTabbedPane();
         tabs.setFont(AppConfig.FONT_LABEL);
-        tabs.addTab("📦  Inventory Items", buildTabPanel(invSearch, invAdd, invEdit, invDelete, invTable, invModel));
-        tabs.addTab("🏭  Suppliers",       buildTabPanel(supSearch, supAdd, supEdit, supDelete, supTable, supModel));
+        tabs.addTab("📦  Inventory Items", buildTabPanel(invSearch, invAdd, invEdit, invDelete, invRestock, invTable, invModel));
+        tabs.addTab("🏭  Suppliers",       buildTabPanel(supSearch, supAdd, supEdit, supDelete, null, supTable, supModel));
+        tabs.addTab("📋  Stock History",   buildHistoryPanel());
         add(tabs, BorderLayout.CENTER);
 
         // ── Selection listeners ───────────────────────────────────────────────
         invTable.getSelectionModel().addListSelectionListener(e -> {
             boolean sel = invTable.getSelectedRow() >= 0;
             invEdit.setEnabled(sel); invDelete.setEnabled(sel);
+            invRestock.setEnabled(sel && PermissionManager.canRestockInventory());
         });
         supTable.getSelectionModel().addListSelectionListener(e -> {
             boolean sel = supTable.getSelectedRow() >= 0;
@@ -227,6 +246,94 @@ public class InventoryPanel extends JPanel {
         }
     }
 
+    private void restockItem() {
+        InventoryItem it = getSelectedItem();
+        if (it == null) return;
+        String input = JOptionPane.showInputDialog(this,
+                "Restock '" + it.getName() + "'\nCurrent stock: " +
+                String.format("%.2f %s", it.getCurrentStock(), it.getUnit()) +
+                "\n\nEnter quantity to add:",
+                "Restock Item", JOptionPane.PLAIN_MESSAGE);
+        if (input == null || input.isBlank()) return;
+        try {
+            double qty = Double.parseDouble(input.trim());
+            if (qty <= 0) { showError("Quantity must be greater than zero."); return; }
+            var user = SessionManager.getCurrentUser();
+            AppContext.inventoryMovementService().recordStockIn(
+                    it.getId(), qty, "Manual restock via admin panel",
+                    user != null ? user.getId() : null);
+            loadData();
+            JOptionPane.showMessageDialog(this,
+                    "Restocked " + qty + " " + it.getUnit() + " of " + it.getName(),
+                    "Restock Complete", JOptionPane.INFORMATION_MESSAGE);
+        } catch (NumberFormatException ex) {
+            showError("Invalid quantity. Enter a numeric value.");
+        } catch (AppException ex) {
+            showError(ex.getMessage());
+        }
+    }
+
+    private void loadHistory() {
+        histModel.setRowCount(0);
+        try {
+            List<InventoryMovement> movements = AppContext.inventoryMovementService().getRecent(200);
+            for (InventoryMovement m : movements) {
+                histModel.addRow(new Object[]{
+                    m.getCreatedAt() != null ? m.getCreatedAt().format(DT_FMT) : "—",
+                    m.getInventoryName() != null ? m.getInventoryName() : "—",
+                    m.getTypeLabel(),
+                    String.format("%.2f", m.getQuantity()),
+                    String.format("%.2f", m.getQuantityBefore()),
+                    String.format("%.2f", m.getQuantityAfter()),
+                    m.getNotes() != null ? m.getNotes() : "—",
+                    m.getCreatedByName() != null ? m.getCreatedByName() : "System"
+                });
+            }
+        } catch (Exception ex) { showError("Could not load history: " + ex.getMessage()); }
+    }
+
+    private JPanel buildHistoryPanel() {
+        JPanel p = new JPanel(new BorderLayout(0, 10));
+        p.setBackground(AppConfig.COLOR_BG);
+        p.setBorder(new EmptyBorder(10, 0, 0, 0));
+
+        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        toolbar.setOpaque(false);
+        RoundedButton refreshBtn = new RoundedButton("↻ Refresh", RoundedButton.Style.GHOST);
+        refreshBtn.addActionListener(e -> loadHistory());
+        toolbar.add(refreshBtn);
+
+        JLabel count = new JLabel(" ");
+        count.setFont(AppConfig.FONT_SMALL);
+        count.setForeground(AppConfig.COLOR_TEXT_SECONDARY);
+        histModel.addTableModelListener(e -> count.setText(histModel.getRowCount() + " record(s)"));
+
+        // colour movement type
+        histTable.getColumnModel().getColumn(2).setCellRenderer(movTypeRenderer());
+
+        p.add(toolbar,                  BorderLayout.NORTH);
+        p.add(new JScrollPane(histTable), BorderLayout.CENTER);
+        p.add(count,                    BorderLayout.SOUTH);
+        return p;
+    }
+
+    private static DefaultTableCellRenderer movTypeRenderer() {
+        return new DefaultTableCellRenderer() {
+            @Override public Component getTableCellRendererComponent(
+                    JTable t, Object v, boolean sel, boolean focus, int row, int col) {
+                super.getTableCellRendererComponent(t, v, sel, focus, row, col);
+                String s = v != null ? v.toString() : "";
+                setForeground(switch (s) {
+                    case "Stock In"        -> AppConfig.COLOR_SUCCESS;
+                    case "Stock Out"       -> AppConfig.COLOR_ERROR;
+                    case "Order Deduction" -> AppConfig.COLOR_WARNING;
+                    default                -> AppConfig.COLOR_TEXT_SECONDARY;
+                });
+                return this;
+            }
+        };
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private InventoryItem getSelectedItem() {
@@ -277,7 +384,7 @@ public class InventoryPanel extends JPanel {
     // ── Builder helpers ───────────────────────────────────────────────────────
 
     private static JPanel buildTabPanel(JTextField search, JButton add,
-                                         JButton edit, JButton del,
+                                         JButton edit, JButton del, JButton extra,
                                          JTable table, DefaultTableModel model) {
         JPanel p = new JPanel(new BorderLayout(0, 10));
         p.setBackground(AppConfig.COLOR_BG);
@@ -287,6 +394,7 @@ public class InventoryPanel extends JPanel {
         toolbar.setOpaque(false);
         search.setPreferredSize(new Dimension(220, 34));
         toolbar.add(search); toolbar.add(add); toolbar.add(edit); toolbar.add(del);
+        if (extra != null) toolbar.add(extra);
         p.add(toolbar, BorderLayout.NORTH);
 
         JLabel count = new JLabel(" ");

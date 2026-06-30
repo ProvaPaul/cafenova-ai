@@ -68,6 +68,16 @@ public class Main {
 
         AppContext.initializeStep3(supplierService, inventoryService, orderService, billingService);
 
+        // Step 3b: V2 services (InventoryMovement, Notifications, updated Dashboard)
+        InventoryMovementDaoImpl movementDao         = new InventoryMovementDaoImpl();
+        NotificationDaoImpl      notificationDao     = new NotificationDaoImpl();
+        InventoryMovementServiceImpl movementService = new InventoryMovementServiceImpl(movementDao, inventoryDao);
+        NotificationServiceImpl      notifService    = new NotificationServiceImpl(notificationDao);
+        DashboardServiceImpl         dashboardV2     = new DashboardServiceImpl(inventoryDao, orderDao);
+
+        AppContext.initializeV2Services(movementService, notifService);
+        AppContext.initialize(categoryService, productService, dashboardV2); // override dashboard with richer version
+
         // Step 4 DAOs + Services (Customer, Employee, Attendance, Salary, Reservation, Report)
         com.smartcafe.dao.impl.CustomerDaoImpl     customerDao     = new com.smartcafe.dao.impl.CustomerDaoImpl();
         com.smartcafe.dao.impl.EmployeeDaoImpl     employeeDao     = new com.smartcafe.dao.impl.EmployeeDaoImpl();

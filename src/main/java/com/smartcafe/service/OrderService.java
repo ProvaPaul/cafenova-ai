@@ -2,6 +2,7 @@ package com.smartcafe.service;
 
 import com.smartcafe.model.CartItem;
 import com.smartcafe.model.Order;
+import com.smartcafe.model.OrderItem;
 
 import java.util.List;
 
@@ -26,4 +27,13 @@ public interface OrderService {
                      String paymentMethod, double amountPaid, int cashierId);
 
     List<Order> findRecent(int limit);
+
+    /** Returns all orders (no limit), newest first. */
+    List<Order> findAll();
+
+    /** Updates the order status directly (used by order management panel). */
+    void updateStatus(int orderId, String newStatus);
+
+    /** Returns the order items with product names populated. */
+    List<OrderItem> findItemsByOrderId(int orderId);
 }

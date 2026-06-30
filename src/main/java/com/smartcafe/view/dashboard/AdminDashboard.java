@@ -7,6 +7,7 @@ import com.smartcafe.util.SessionManager;
 import com.smartcafe.view.components.RoundedButton;
 import com.smartcafe.view.components.SidebarButton;
 import com.smartcafe.view.panel.*;
+import com.smartcafe.view.panel.OrderManagementPanel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -19,6 +20,7 @@ public class AdminDashboard extends JPanel {
     private static final String K_PRODUCTS  = "PRODUCTS";
     private static final String K_INVENTORY = "INVENTORY";
     private static final String K_POS       = "POS";
+    private static final String K_ORDERS    = "ORDERS";
     private static final String K_BILLING   = "BILLING";
     private static final String K_CUSTOMERS = "CUSTOMERS";
     private static final String K_EMPLOYEES = "EMPLOYEES";
@@ -31,6 +33,7 @@ public class AdminDashboard extends JPanel {
         {"🏷",  "Categories",    K_CATS},
         {"📦",  "Products",      K_PRODUCTS},
         {"🖥️", "POS",            K_POS},
+        {"📋",  "Orders",        K_ORDERS},
         {"🏭",  "Inventory",     K_INVENTORY},
         {"💳",  "Billing",       K_BILLING},
         {"👥",  "Customers",     K_CUSTOMERS},
@@ -44,18 +47,19 @@ public class AdminDashboard extends JPanel {
     private final CardLayout     cardLayout  = new CardLayout();
     private final JPanel         contentArea = new JPanel(cardLayout);
 
-    private DashboardHomePanel homePanel;
-    private CategoryPanel      categoryPanel;
-    private ProductPanel       productPanel;
-    private InventoryPanel     inventoryPanel;
-    private POSPanel           posPanel;
-    private BillHistoryPanel   billingPanel;
-    private CustomerPanel      customerPanel;
-    private EmployeePanel      employeePanel;
-    private ReservationPanel   reservationPanel;
-    private ReportPanel        reportPanel;
-    private SettingsPanel      settingsPanel;
-    private SidebarButton[]    sidebarBtns;
+    private DashboardHomePanel    homePanel;
+    private CategoryPanel         categoryPanel;
+    private ProductPanel          productPanel;
+    private InventoryPanel        inventoryPanel;
+    private POSPanel              posPanel;
+    private OrderManagementPanel  ordersPanel;
+    private BillHistoryPanel      billingPanel;
+    private CustomerPanel         customerPanel;
+    private EmployeePanel         employeePanel;
+    private ReservationPanel      reservationPanel;
+    private ReportPanel           reportPanel;
+    private SettingsPanel         settingsPanel;
+    private SidebarButton[]       sidebarBtns;
 
     public AdminDashboard(AuthController controller) {
         this.controller = controller;
@@ -70,23 +74,25 @@ public class AdminDashboard extends JPanel {
     private void buildContentArea() {
         contentArea.setBackground(AppConfig.COLOR_BG);
 
-        homePanel       = new DashboardHomePanel(() -> switchTo(K_CATS), () -> switchTo(K_PRODUCTS));
-        categoryPanel   = new CategoryPanel();
-        productPanel    = new ProductPanel(false);
-        inventoryPanel  = new InventoryPanel();
-        posPanel        = new POSPanel();
-        billingPanel    = new BillHistoryPanel();
-        customerPanel   = new CustomerPanel();
-        employeePanel   = new EmployeePanel();
-        reservationPanel= new ReservationPanel();
-        reportPanel     = new ReportPanel();
-        settingsPanel   = new SettingsPanel();
+        homePanel        = new DashboardHomePanel(() -> switchTo(K_CATS), () -> switchTo(K_PRODUCTS), () -> switchTo(K_ORDERS));
+        categoryPanel    = new CategoryPanel();
+        productPanel     = new ProductPanel(false);
+        inventoryPanel   = new InventoryPanel();
+        posPanel         = new POSPanel();
+        ordersPanel      = new OrderManagementPanel();
+        billingPanel     = new BillHistoryPanel();
+        customerPanel    = new CustomerPanel();
+        employeePanel    = new EmployeePanel();
+        reservationPanel = new ReservationPanel();
+        reportPanel      = new ReportPanel();
+        settingsPanel    = new SettingsPanel();
 
         contentArea.add(homePanel,        K_HOME);
         contentArea.add(categoryPanel,    K_CATS);
         contentArea.add(productPanel,     K_PRODUCTS);
         contentArea.add(inventoryPanel,   K_INVENTORY);
         contentArea.add(posPanel,         K_POS);
+        contentArea.add(ordersPanel,      K_ORDERS);
         contentArea.add(billingPanel,     K_BILLING);
         contentArea.add(customerPanel,    K_CUSTOMERS);
         contentArea.add(employeePanel,    K_EMPLOYEES);
@@ -105,6 +111,7 @@ public class AdminDashboard extends JPanel {
             case K_PRODUCTS  -> productPanel.loadData();
             case K_INVENTORY -> inventoryPanel.loadData();
             case K_POS       -> posPanel.loadData();
+            case K_ORDERS    -> ordersPanel.loadData();
             case K_BILLING   -> billingPanel.loadData();
             case K_CUSTOMERS -> customerPanel.loadData();
             case K_EMPLOYEES -> employeePanel.loadData();

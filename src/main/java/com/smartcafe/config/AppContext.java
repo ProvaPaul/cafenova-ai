@@ -14,10 +14,12 @@ public final class AppContext {
     private static volatile DashboardService dashboardService;
 
     // Step 3 services
-    private static volatile SupplierService  supplierService;
-    private static volatile InventoryService inventoryService;
-    private static volatile OrderService     orderService;
-    private static volatile BillingService   billingService;
+    private static volatile SupplierService            supplierService;
+    private static volatile InventoryService           inventoryService;
+    private static volatile InventoryMovementService   inventoryMovementService;
+    private static volatile NotificationService        notificationService;
+    private static volatile OrderService               orderService;
+    private static volatile BillingService             billingService;
 
     // Step 4 services
     private static volatile CustomerService    customerService;
@@ -46,6 +48,11 @@ public final class AppContext {
         billingService   = bs;
     }
 
+    public static void initializeV2Services(InventoryMovementService ims, NotificationService ns) {
+        inventoryMovementService = ims;
+        notificationService      = ns;
+    }
+
     public static void initializeStep4(CustomerService cs, EmployeeService es,
                                        AttendanceService as, SalaryService ss,
                                        ReservationService rs, ReportService rps) {
@@ -63,10 +70,12 @@ public final class AppContext {
     public static DashboardService dashboardService() { return require(dashboardService, "dashboardService"); }
 
     // Step 3 accessors
-    public static SupplierService  supplierService()  { return require(supplierService,  "supplierService"); }
-    public static InventoryService inventoryService() { return require(inventoryService, "inventoryService"); }
-    public static OrderService     orderService()     { return require(orderService,     "orderService"); }
-    public static BillingService   billingService()   { return require(billingService,   "billingService"); }
+    public static SupplierService          supplierService()          { return require(supplierService,          "supplierService"); }
+    public static InventoryService         inventoryService()         { return require(inventoryService,         "inventoryService"); }
+    public static OrderService             orderService()             { return require(orderService,             "orderService"); }
+    public static BillingService           billingService()           { return require(billingService,           "billingService"); }
+    public static InventoryMovementService inventoryMovementService() { return require(inventoryMovementService, "inventoryMovementService"); }
+    public static NotificationService      notificationService()      { return require(notificationService,      "notificationService"); }
 
     // Step 4 accessors
     public static CustomerService    customerService()    { return require(customerService,    "customerService"); }

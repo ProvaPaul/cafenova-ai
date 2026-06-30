@@ -7,12 +7,47 @@ import java.util.List;
 public class Order {
 
     // Status constants (mirror DB ENUM)
+    public static final String STATUS_NEW         = "NEW";
     public static final String STATUS_PENDING     = "PENDING";
+    public static final String STATUS_CONFIRMED   = "CONFIRMED";
+    public static final String STATUS_PREPARING   = "PREPARING";
     public static final String STATUS_IN_PROGRESS = "IN_PROGRESS";
     public static final String STATUS_READY       = "READY";
     public static final String STATUS_SERVED      = "SERVED";
     public static final String STATUS_COMPLETED   = "COMPLETED";
     public static final String STATUS_CANCELLED   = "CANCELLED";
+
+    public static final String[] ALL_ACTIVE_STATUSES = {
+        STATUS_NEW, STATUS_PENDING, STATUS_CONFIRMED, STATUS_PREPARING, STATUS_IN_PROGRESS, STATUS_READY, STATUS_SERVED
+    };
+
+    public static String statusLabel(String status) {
+        return switch (status) {
+            case STATUS_NEW       -> "🆕 New";
+            case STATUS_PENDING   -> "⏳ Pending";
+            case STATUS_CONFIRMED -> "✅ Confirmed";
+            case STATUS_PREPARING, STATUS_IN_PROGRESS -> "👨‍🍳 Preparing";
+            case STATUS_READY     -> "🔔 Ready";
+            case STATUS_SERVED    -> "🍽 Served";
+            case STATUS_COMPLETED -> "✔ Completed";
+            case STATUS_CANCELLED -> "❌ Cancelled";
+            default               -> status;
+        };
+    }
+
+    public static java.awt.Color statusColor(String status) {
+        return switch (status) {
+            case STATUS_NEW       -> new java.awt.Color(0x6C757D);
+            case STATUS_PENDING   -> new java.awt.Color(0xFFC107);
+            case STATUS_CONFIRMED -> new java.awt.Color(0x17A2B8);
+            case STATUS_PREPARING, STATUS_IN_PROGRESS -> new java.awt.Color(0xFD7E14);
+            case STATUS_READY     -> new java.awt.Color(0x28A745);
+            case STATUS_SERVED    -> new java.awt.Color(0x20C997);
+            case STATUS_COMPLETED -> new java.awt.Color(0x6610F2);
+            case STATUS_CANCELLED -> new java.awt.Color(0xDC3545);
+            default               -> java.awt.Color.GRAY;
+        };
+    }
 
     // Type constants
     public static final String TYPE_DINE_IN  = "DINE_IN";

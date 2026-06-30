@@ -69,10 +69,11 @@ public class BillHistoryPanel extends JPanel {
         fromModel.setValue(cal.getTime());
 
         statusCombo = new JComboBox<>(new String[]{
-            "ALL", Order.STATUS_COMPLETED, Order.STATUS_PENDING,
-            Order.STATUS_IN_PROGRESS, Order.STATUS_CANCELLED});
+            "ALL", Order.STATUS_COMPLETED, Order.STATUS_SERVED,
+            Order.STATUS_READY, Order.STATUS_PREPARING, Order.STATUS_CONFIRMED,
+            Order.STATUS_PENDING, Order.STATUS_NEW, Order.STATUS_CANCELLED});
         statusCombo.setFont(AppConfig.FONT_BODY);
-        statusCombo.setPreferredSize(new Dimension(140, 32));
+        statusCombo.setPreferredSize(new Dimension(150, 32));
 
         RoundedButton searchBtn = new RoundedButton("🔍  Search", RoundedButton.Style.PRIMARY);
         searchBtn.addActionListener(e -> loadData());
@@ -232,13 +233,8 @@ public class BillHistoryPanel extends JPanel {
                     JTable t, Object v, boolean sel, boolean focus, int row, int col) {
                 super.getTableCellRendererComponent(t, v, sel, focus, row, col);
                 String s = v != null ? v.toString() : "";
-                switch (s) {
-                    case Order.STATUS_COMPLETED   -> setForeground(AppConfig.COLOR_SUCCESS);
-                    case Order.STATUS_CANCELLED   -> setForeground(AppConfig.COLOR_ERROR);
-                    case Order.STATUS_PENDING,
-                         Order.STATUS_IN_PROGRESS -> setForeground(AppConfig.COLOR_WARNING);
-                    default                       -> setForeground(AppConfig.COLOR_TEXT_SECONDARY);
-                }
+                setForeground(Order.statusColor(s));
+                setText(Order.statusLabel(s));
                 setHorizontalAlignment(CENTER);
                 return this;
             }
