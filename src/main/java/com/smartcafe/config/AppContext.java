@@ -1,5 +1,7 @@
 package com.smartcafe.config;
 
+import com.smartcafe.ai.AiRecommendationService;
+import com.smartcafe.ai.AiRecommendationServiceStub;
 import com.smartcafe.service.*;
 
 import java.util.Objects;
@@ -24,6 +26,9 @@ public final class AppContext {
     private static volatile SalaryService      salaryService;
     private static volatile ReservationService reservationService;
     private static volatile ReportService      reportService;
+
+    // Step 5: AI (stub by default; swap for AiRecommendationServiceImpl when FastAPI is live)
+    private static volatile AiRecommendationService aiService;
 
     private AppContext() {}
 
@@ -70,6 +75,16 @@ public final class AppContext {
     public static SalaryService      salaryService()      { return require(salaryService,      "salaryService"); }
     public static ReservationService reservationService() { return require(reservationService, "reservationService"); }
     public static ReportService      reportService()      { return require(reportService,      "reportService"); }
+
+    // Step 5 init + accessor (never null — falls back to stub)
+    public static void initializeStep5(AiRecommendationService ai) {
+        aiService = ai;
+    }
+
+    public static AiRecommendationService aiService() {
+        AiRecommendationService svc = aiService;
+        return svc != null ? svc : new AiRecommendationServiceStub();
+    }
 
     private static <T> T require(T svc, String name) {
         return Objects.requireNonNull(svc, "AppContext: " + name + " not initialized");

@@ -85,6 +85,9 @@ public class Main {
         AppContext.initializeStep4(customerService4, employeeService4, attendanceService4,
                                    salaryService4, reservationService4, reportService4);
 
+        // Step 5: AI (stub — wire AiRecommendationServiceImpl here when Python FastAPI is live)
+        AppContext.initializeStep5(new com.smartcafe.ai.AiRecommendationServiceStub());
+
         // ④ Build and show UI on the EDT
         SwingUtilities.invokeLater(() -> {
             MainFrame frame = new MainFrame();

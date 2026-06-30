@@ -45,6 +45,7 @@ public class ReportPanel extends JPanel {
         tabs.addTab("📈  Monthly Sales",  buildMonthlyTab());
         tabs.addTab("📦  Product Sales",  buildProductTab());
         tabs.addTab("👥  Top Customers",  buildCustomerTab());
+        tabs.addTab("🤖  AI Insights",    buildAiInsightsTab());
         add(tabs, BorderLayout.CENTER);
     }
 
@@ -257,6 +258,75 @@ public class ReportPanel extends JPanel {
         filter.add(loadBtn);
 
         return tabPanel(filter, chartHolder, tbl);
+    }
+
+    // ── AI INSIGHTS ──────────────────────────────────────────────────────────
+
+    private JPanel buildAiInsightsTab() {
+        String[] recCols  = {"Menu Item", "Confidence", "Reason"};
+        String[] fcCols   = {"Date", "Predicted Revenue (₱)", "Confidence"};
+        String[] insCols  = {"Customer", "Segment", "Insight", "Score"};
+        DefaultTableModel recModel = emptyModel(recCols);
+        DefaultTableModel fcModel  = emptyModel(fcCols);
+        DefaultTableModel insModel = emptyModel(insCols);
+        JTable recTable  = styledTable(recModel);
+        JTable fcTable   = styledTable(fcModel);
+        JTable insTable  = styledTable(insModel);
+
+        JLabel statusLbl = new JLabel(" ");
+        statusLbl.setFont(AppConfig.FONT_SMALL);
+        statusLbl.setForeground(AppConfig.COLOR_TEXT_SECONDARY);
+
+        RoundedButton loadBtn = new RoundedButton("Load AI Insights", RoundedButton.Style.PRIMARY);
+        loadBtn.addActionListener(e -> {
+            var svc = AppContext.aiService();
+            statusLbl.setText(svc.isAvailable()
+                ? "Connected to live AI service"
+                : "Demo data  —  connect Python FastAPI to enable live recommendations");
+
+            recModel.setRowCount(0);
+            for (var r : svc.getMenuRecommendations())
+                recModel.addRow(new Object[]{r.itemName(),
+                    String.format("%.0f%%", r.confidenceScore() * 100), r.reason()});
+
+            fcModel.setRowCount(0);
+            for (var r : svc.getSalesForecast(7))
+                fcModel.addRow(new Object[]{r.date(),
+                    String.format("%.2f", r.predictedRevenue()),
+                    String.format("%.0f%%", r.confidence() * 100)});
+
+            insModel.setRowCount(0);
+            for (var r : svc.getCustomerInsights(10))
+                insModel.addRow(new Object[]{r.customerName(), r.segment(),
+                    r.insight(), String.format("%.0f%%", r.score() * 100)});
+        });
+
+        JTabbedPane aiTabs = new JTabbedPane();
+        aiTabs.setFont(AppConfig.FONT_LABEL);
+        JPanel rWrap = wrap(recTable);
+        JPanel fWrap = wrap(fcTable);
+        JPanel iWrap = wrap(insTable);
+        aiTabs.addTab("Menu Recommendations",  rWrap);
+        aiTabs.addTab("Sales Forecast (7 days)", fWrap);
+        aiTabs.addTab("Customer Insights",     iWrap);
+
+        JPanel filter = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 4));
+        filter.setOpaque(false);
+        filter.add(loadBtn); filter.add(statusLbl);
+
+        JPanel p = new JPanel(new BorderLayout(0, 8));
+        p.setBackground(AppConfig.COLOR_BG);
+        p.setBorder(new EmptyBorder(10, 0, 0, 0));
+        p.add(filter,  BorderLayout.NORTH);
+        p.add(aiTabs,  BorderLayout.CENTER);
+        return p;
+    }
+
+    private static JPanel wrap(JTable t) {
+        JPanel p = new JPanel(new BorderLayout());
+        p.setBackground(AppConfig.COLOR_BG);
+        p.add(new JScrollPane(t));
+        return p;
     }
 
     // ── SHARED HELPERS ────────────────────────────────────────────────────────
